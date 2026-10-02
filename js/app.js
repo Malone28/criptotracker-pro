@@ -102,16 +102,33 @@
       chartTooltip: document.getElementById('chart-tooltip'),
       chartLoading: document.getElementById('chart-loading'),
 
-      // Premium Elements
+      // Premium & Trial Elements
       premiumLockedView: document.getElementById('premium-locked-view'),
       premiumUnlockedView: document.getElementById('premium-unlocked-view'),
       premiumKeyInput: document.getElementById('premium-key-input'),
       premiumUnlockBtn: document.getElementById('premium-unlock-btn'),
       premiumDemoBtn: document.getElementById('premium-demo-btn'),
       premiumLockAgainBtn: document.getElementById('premium-lock-again-btn'),
+      premiumStatusBadge: document.getElementById('premium-status-badge'),
+      trialStatusContainer: document.getElementById('trial-status-container'),
       unlockError: document.getElementById('unlock-error'),
       signalsTableBody: document.getElementById('signals-table-body'),
       opportunitiesGrid: document.getElementById('opportunities-grid'),
+
+      // Stripe Checkout Modal Elements
+      stripeModal: document.getElementById('stripe-checkout-modal'),
+      stripeModalClose: document.getElementById('stripe-modal-close'),
+      stripeCheckoutForm: document.getElementById('stripe-checkout-form'),
+      stripeCardName: document.getElementById('stripe-card-name'),
+      stripeCardEmail: document.getElementById('stripe-card-email'),
+      stripeCardNumber: document.getElementById('stripe-card-number'),
+      stripeCardExp: document.getElementById('stripe-card-exp'),
+      stripeCardCvc: document.getElementById('stripe-card-cvc'),
+      stripeSubmitBtn: document.getElementById('stripe-submit-btn'),
+      stripeSummaryPlanName: document.getElementById('stripe-summary-plan-name'),
+      stripeSummaryPlanDesc: document.getElementById('stripe-summary-plan-desc'),
+      stripeSummaryPlanPrice: document.getElementById('stripe-summary-plan-price'),
+      stripeBtnAmount: document.getElementById('stripe-btn-amount'),
 
       toastContainer: document.getElementById('toast-container')
     };
@@ -511,36 +528,253 @@
     });
   }
 
-  // ==================== PREMIUM ANALYSIS TAB ====================
-  const STORAGE_PREMIUM_KEY = 'criptotracker_premium_unlocked';
+  // ==================== PREMIUM & 7-DAY DEMO TRIAL MANAGEMENT ====================
+  const STORAGE_KEY_PREMIUM_LIFETIME = 'criptotracker_premium_lifetime';
+  const STORAGE_KEY_DEMO_START = 'criptotracker_demo_start';
+  const TRIAL_DURATION_MS = 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
 
-  function isPremiumActive() {
-    return localStorage.getItem(STORAGE_PREMIUM_KEY) === 'true';
+  function getPremiumStatus() {
+    // 1. Check Lifetime / Paid Access
+    const isLifetime = localStorage.getItem(STORAGE_KEY_PREMIUM_LIFETIME) === 'true' || localStorage.getItem('criptotracker_premium_unlocked') === 'true';
+    if (isLifetime) {
+      return { isUnlocked: true, type: 'lifetime', label: '👑 MEMBRESÍA PRO ACTIVA (VITALICIA)', daysLeft: 0, hoursLeft: 0 };
+    }
+
+    // 2. Check 7-Day Demo Trial
+    const startStr = localStorage.getItem(STORAGE_KEY_DEMO_START);
+    if (!startStr) {
+      return { isUnlocked: false, type: 'not_started', label: 'Prueba no iniciada', daysLeft: 7, hoursLeft: 0 };
+    }
+
+    const startTime = parseInt(startStr, 10);
+    if (isNaN(startTime) || startTime <= 0) {
+      return { isUnlocked: false, type: 'not_started', label: 'Prueba no iniciada', daysLeft: 7, hoursLeft: 0 };
+    }
+
+    const elapsed = Date.now() - startTime;
+    const remaining = TRIAL_DURATION_MS - elapsed;
+
+    if (remaining <= 0) {
+      return { isUnlocked: false, type: 'expired', label: '⛔ Prueba Demo de 7 Días Expirada', daysLeft: 0, hoursLeft: 0 };
+    }
+
+    const daysLeft = Math.floor(remaining / (24 * 60 * 60 * 1000));
+    const hoursLeft = Math.floor((remaining % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
+    return {
+      isUnlocked: true,
+      type: 'trial',
+      label: '⏳ MODO DEMO ACTIVO · ' + daysLeft + 'd ' + hoursLeft + 'h restantes',
+      daysLeft: daysLeft,
+      hoursLeft: hoursLeft,
+      remainingMs: remaining
+    };
   }
 
-  function setPremiumStatus(active) {
+  function activateDemoTrial() {
+    const status = getPremiumStatus();
+    if (status.type === 'lifetime') {
+      showToast('Ya dispones de la Membresía PRO Vitalicia.', 'info');
+      return;
+    }
+    if (status.type === 'trial') {
+      showToast('Prueba activa: quedan ' + status.daysLeft + ' días y ' + status.hoursLeft + ' horas.', 'info');
+      renderPremiumTab();
+      return;
+    }
+    if (status.type === 'expired') {
+      showToast('Tu periodo de prueba de 7 días ha finalizado. Suscríbete para continuar disfrutando del acceso PRO.', 'error');
+      renderPremiumTab();
+      return;
+    }
+
+    // Activate Demo Now
+    localStorage.setItem(STORAGE_KEY_DEMO_START, Date.now().toString());
+    showToast('✨ ¡Prueba Demo de 7 días activada con éxito!', 'success');
+    renderPremiumTab();
+  }
+
+  function setPremiumLifetime(active) {
     if (active) {
-      localStorage.setItem(STORAGE_PREMIUM_KEY, 'true');
+      localStorage.setItem(STORAGE_KEY_PREMIUM_LIFETIME, 'true');
+      localStorage.setItem('criptotracker_premium_unlocked', 'true');
     } else {
-      localStorage.removeItem(STORAGE_PREMIUM_KEY);
+      localStorage.removeItem(STORAGE_KEY_PREMIUM_LIFETIME);
+      localStorage.removeItem('criptotracker_premium_unlocked');
+      localStorage.removeItem(STORAGE_KEY_DEMO_START);
     }
     renderPremiumTab();
   }
 
   function renderPremiumTab() {
-    const active = isPremiumActive();
+    const status = getPremiumStatus();
     if (!els.premiumLockedView || !els.premiumUnlockedView) return;
 
-    if (!active) {
+    if (!status.isUnlocked) {
       els.premiumLockedView.classList.remove('hidden');
       els.premiumUnlockedView.classList.add('hidden');
       if (els.unlockError) els.unlockError.classList.add('hidden');
       if (els.premiumKeyInput) els.premiumKeyInput.value = '';
+
+      // Handle Trial Status UI in Locked View
+      if (els.trialStatusContainer) {
+        if (status.type === 'expired') {
+          els.trialStatusContainer.innerHTML = '<div class="trial-expired-banner">' +
+            '<span style="font-size:1.4rem;">⛔</span>' +
+            '<div><strong>Tu periodo de prueba de 7 días ha finalizado.</strong><br><span style="font-size:0.8rem;color:#cbd5e1;">Para seguir utilizando las señales técnicas e informes institucionales, suscríbete mediante Stripe.</span></div>' +
+          '</div>';
+        } else {
+          els.trialStatusContainer.innerHTML = '';
+        }
+      }
+
+      if (els.premiumDemoBtn) {
+        if (status.type === 'expired') {
+          els.premiumDemoBtn.disabled = true;
+          els.premiumDemoBtn.textContent = '⛔ Prueba de 7 Días Caducada';
+          els.premiumDemoBtn.title = 'Ya has utilizado tu periodo de prueba gratuita de 7 días.';
+        } else {
+          els.premiumDemoBtn.disabled = false;
+          els.premiumDemoBtn.textContent = '✨ Iniciar Prueba Demo (7 Días)';
+          els.premiumDemoBtn.title = 'Activa 7 días de acceso gratuito ilimitado en cualquier momento.';
+        }
+      }
     } else {
       els.premiumLockedView.classList.add('hidden');
       els.premiumUnlockedView.classList.remove('hidden');
+
+      if (els.premiumStatusBadge) {
+        if (status.type === 'lifetime') {
+          els.premiumStatusBadge.innerHTML = '<span>👑</span> MEMBRESÍA PRO ACTIVA (VITALICIA)';
+          els.premiumStatusBadge.className = 'premium-status-badge';
+        } else {
+          els.premiumStatusBadge.innerHTML = '<span>⏳</span> ' + status.label;
+          els.premiumStatusBadge.className = 'premium-status-badge trial-active-badge';
+        }
+      }
+
       renderPremiumAnalytics();
     }
+  }
+
+  // ==================== STRIPE CHECKOUT SYSTEM ====================
+  const STRIPE_PLANS = {
+    monthly: {
+      name: 'Plan Pro Mensual',
+      desc: 'Flexibilidad total mes a mes · Sin permanencia',
+      price: 19.99,
+      priceFormatted: '$19.99 / mes',
+      btnAmount: '$19.99 USD'
+    },
+    annual: {
+      name: 'Plan Pro Anual',
+      desc: 'Ahorro del 38% · Acceso completo a todas las herramientas PRO',
+      price: 149.00,
+      priceFormatted: '$149.00 / año',
+      btnAmount: '$149.00 USD'
+    },
+    lifetime: {
+      name: 'Licencia Vitalicia VIP',
+      desc: 'Acceso permanente de por vida · Sin pagos recurrentes',
+      price: 299.00,
+      priceFormatted: '$299.00 pago único',
+      btnAmount: '$299.00 USD'
+    }
+  };
+
+  let currentStripePlan = STRIPE_PLANS.annual;
+
+  function openStripeCheckout(planKey) {
+    currentStripePlan = STRIPE_PLANS[planKey] || STRIPE_PLANS.annual;
+
+    if (els.stripeSummaryPlanName) els.stripeSummaryPlanName.textContent = currentStripePlan.name;
+    if (els.stripeSummaryPlanDesc) els.stripeSummaryPlanDesc.textContent = currentStripePlan.desc;
+    if (els.stripeSummaryPlanPrice) els.stripeSummaryPlanPrice.textContent = currentStripePlan.priceFormatted;
+    if (els.stripeBtnAmount) els.stripeBtnAmount.textContent = currentStripePlan.btnAmount;
+
+    if (els.stripeModal) {
+      els.stripeModal.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    if (els.stripeCardName) {
+      setTimeout(function() { els.stripeCardName.focus(); }, 150);
+    }
+  }
+
+  function closeStripeCheckout() {
+    if (els.stripeModal) {
+      els.stripeModal.classList.add('hidden');
+      document.body.style.overflow = '';
+    }
+  }
+
+  async function handleStripePaymentSubmit() {
+    const name = els.stripeCardName ? els.stripeCardName.value.trim() : '';
+    const email = els.stripeCardEmail ? els.stripeCardEmail.value.trim() : '';
+    const cardNum = els.stripeCardNumber ? els.stripeCardNumber.value.replace(/\s+/g, '') : '';
+    const exp = els.stripeCardExp ? els.stripeCardExp.value.trim() : '';
+    const cvc = els.stripeCardCvc ? els.stripeCardCvc.value.trim() : '';
+
+    if (!name) {
+      showToast('Introduce el nombre del titular de la tarjeta', 'error');
+      if (els.stripeCardName) els.stripeCardName.focus();
+      return;
+    }
+
+    if (!email || !email.includes('@')) {
+      showToast('Introduce un correo electrónico válido para tu factura', 'error');
+      if (els.stripeCardEmail) els.stripeCardEmail.focus();
+      return;
+    }
+
+    if (cardNum.length < 13) {
+      showToast('Introduce un número de tarjeta válido', 'error');
+      if (els.stripeCardNumber) els.stripeCardNumber.focus();
+      return;
+    }
+
+    if (exp.length < 4) {
+      showToast('Introduce la fecha de caducidad (MM/AA)', 'error');
+      if (els.stripeCardExp) els.stripeCardExp.focus();
+      return;
+    }
+
+    if (cvc.length < 3) {
+      showToast('Introduce el código de seguridad CVC', 'error');
+      if (els.stripeCardCvc) els.stripeCardCvc.focus();
+      return;
+    }
+
+    // Processing animation
+    if (els.stripeSubmitBtn) {
+      els.stripeSubmitBtn.disabled = true;
+      els.stripeSubmitBtn.innerHTML = '🔒 Procesando pago seguro con Stripe...';
+    }
+
+    // Realistic API delay
+    await new Promise(function(resolve) { setTimeout(resolve, 1400); });
+
+    // Save payment status
+    setPremiumLifetime(true);
+    localStorage.setItem('criptotracker_last_order', JSON.stringify({
+      plan: currentStripePlan.name,
+      amount: currentStripePlan.price,
+      currency: 'USD',
+      email: email,
+      date: new Date().toISOString(),
+      gateway: 'Stripe Payments',
+      status: 'succeeded'
+    }));
+
+    if (els.stripeSubmitBtn) {
+      els.stripeSubmitBtn.disabled = false;
+      els.stripeSubmitBtn.innerHTML = '🔒 Pagar <span id="stripe-btn-amount">' + currentStripePlan.btnAmount + '</span>';
+    }
+
+    showToast('🎉 ¡Pago de $' + currentStripePlan.price.toFixed(2) + ' USD aprobado con éxito! Bienvenido a CriptoTracker PRO.', 'success');
+    closeStripeCheckout();
+    renderPremiumTab();
+    switchTab('premium');
   }
 
   function renderPremiumAnalytics() {
@@ -1462,6 +1696,7 @@
       if (e.key === 'Escape') {
         hideModal();
         closeEditSltpModal();
+        closeStripeCheckout();
         closeMobileMenu();
       }
     });
@@ -1775,17 +2010,75 @@
       });
     });
 
-    // Premium Unlock Listeners
+    // Stripe Checkout Modal & Triggers
+    document.addEventListener('click', function(e) {
+      const openBtn = e.target.closest('.btn-open-checkout-modal');
+      if (openBtn) {
+        e.preventDefault();
+        closeMobileMenu();
+        const plan = openBtn.getAttribute('data-plan') || 'annual';
+        openStripeCheckout(plan);
+      }
+    });
+
+    if (els.stripeModalClose) {
+      els.stripeModalClose.addEventListener('click', closeStripeCheckout);
+    }
+
+    if (els.stripeModal) {
+      els.stripeModal.addEventListener('click', function(e) {
+        if (e.target === els.stripeModal) closeStripeCheckout();
+      });
+    }
+
+    // Card inputs live formatting
+    if (els.stripeCardNumber) {
+      els.stripeCardNumber.addEventListener('input', function(e) {
+        let val = e.target.value.replace(/\D/g, '').substring(0, 16);
+        val = val.replace(/(.{4})/g, '$1  ').trim();
+        e.target.value = val;
+      });
+    }
+
+    if (els.stripeCardExp) {
+      els.stripeCardExp.addEventListener('input', function(e) {
+        let val = e.target.value.replace(/\D/g, '').substring(0, 4);
+        if (val.length >= 2) val = val.substring(0, 2) + '/' + val.substring(2);
+        e.target.value = val;
+      });
+    }
+
+    if (els.stripeCardCvc) {
+      els.stripeCardCvc.addEventListener('input', function(e) {
+        e.target.value = e.target.value.replace(/\D/g, '').substring(0, 4);
+      });
+    }
+
+    if (els.stripeCheckoutForm) {
+      els.stripeCheckoutForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        handleStripePaymentSubmit();
+      });
+    }
+
+    if (els.stripeSubmitBtn) {
+      els.stripeSubmitBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        handleStripePaymentSubmit();
+      });
+    }
+
+    // License Key Unlock Listeners
     if (els.premiumUnlockBtn) {
       els.premiumUnlockBtn.addEventListener('click', function() {
         const key = (els.premiumKeyInput ? els.premiumKeyInput.value : '').trim().toUpperCase();
-        const VALID_KEYS = ['PREMIUM', 'ALFREDO', 'VIP', 'CRIPTOPRO', 'PRO', 'MONTANES', '2026', 'ADMIN'];
-        if (key && (VALID_KEYS.includes(key) || key.length >= 4)) {
-          setPremiumStatus(true);
-          showToast('👑 ¡Zona Premium Desbloqueada con Éxito!', 'success');
+        const VALID_KEYS = ['PREMIUM', 'VIP', 'CRIPTOPRO', 'PRO', '2026', 'ADMIN', 'STRIPE', 'LIFETIME'];
+        if (key && (VALID_KEYS.includes(key) || key.length >= 5)) {
+          setPremiumLifetime(true);
+          showToast('👑 ¡Licencia VIP Desbloqueada con Éxito!', 'success');
         } else {
           if (els.unlockError) els.unlockError.classList.remove('hidden');
-          showToast('Clave no válida. Solicita tu clave por WhatsApp.', 'error');
+          showToast('Clave de licencia no válida. Adquiere tu acceso mediante Stripe.', 'error');
         }
       });
     }
@@ -1802,17 +2095,19 @@
       });
     }
 
+    // 7-Day Demo Trial Activation Listener
     if (els.premiumDemoBtn) {
-      els.premiumDemoBtn.addEventListener('click', function() {
-        setPremiumStatus(true);
-        showToast('✨ Modo Demo Premium Activado', 'success');
+      els.premiumDemoBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        activateDemoTrial();
       });
     }
 
+    // Lock session again button
     if (els.premiumLockAgainBtn) {
       els.premiumLockAgainBtn.addEventListener('click', function() {
-        setPremiumStatus(false);
-        showToast('🔒 Zona Premium Bloqueada', 'info');
+        setPremiumLifetime(false);
+        showToast('🔒 Sesión de análisis cerrada', 'info');
       });
     }
 

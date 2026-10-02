@@ -36,7 +36,7 @@
         <button class="tab-btn" data-tab="favorites">⭐ Favoritos <span id="favorites-count" class="tab-count">0</span></button>
         <button class="tab-btn" data-tab="portfolio">💼 Portfolio</button>
         <button class="tab-btn tab-btn-premium" data-tab="premium">💎 Análisis Premium</button>
-        <button class="tab-btn" data-tab="about">💬 WhatsApp / Comprar</button>
+        <button class="tab-btn" data-tab="about">💳 Planes & Precios</button>
       </nav>
 
       <!-- Timestamp -->
@@ -83,15 +83,15 @@
           <span class="badge-pro" style="margin-left:auto;font-size:0.62rem;padding:2px 6px;">VIP</span>
         </button>
         <button class="tab-btn" data-tab="about">
-          <span class="tab-icon">💬</span>
-          <span class="tab-text">WhatsApp / Comprar</span>
+          <span class="tab-icon">💳</span>
+          <span class="tab-text">Planes & Suscripción</span>
         </button>
       </div>
 
       <div class="mobile-drawer-footer">
-        <a href="https://wa.me/34644781810?text=Hola,%20deseo%20comprar%20el%20programa%20CriptoTracker." target="_blank" rel="noopener" class="btn btn-whatsapp" style="width:100%;font-size:0.8rem;padding:9px 10px;gap:6px;">
-          💬 WhatsApp · Comprar: 644 78 18 10
-        </a>
+        <button type="button" class="btn btn-stripe-open-modal btn-open-checkout-modal" style="width:100%;font-size:0.85rem;padding:10px 12px;gap:6px;">
+          💳 Desbloquear Acceso PRO (Stripe)
+        </button>
       </div>
     </aside>
 
@@ -298,36 +298,41 @@
               </div>
             </div>
 
+            <!-- Trial Expired Notice / Status Container -->
+            <div id="trial-status-container"></div>
+
             <!-- Unlock Form -->
             <div class="premium-unlock-box">
               <h3 class="unlock-title">🔑 Desbloquear Acceso a la Zona Premium</h3>
-              <p class="unlock-desc">Introduce tu clave de activación o solicita tu acceso mediante WhatsApp directo a Alfredo Montañés:</p>
+              <p class="unlock-desc">
+                Accede a algoritmos cuantitativos en tiempo real, señales técnicas avanzadas y niveles clave de mercado. Desbloquea tu acceso mediante nuestra pasarela segura <strong>Stripe</strong> o activa tu prueba gratuita de 7 días.
+              </p>
               
               <div class="unlock-input-group">
-                <input type="password" id="premium-key-input" class="form-control" placeholder="Introduce tu clave de activación..." autocomplete="off">
+                <input type="password" id="premium-key-input" class="form-control" placeholder="Introduce tu clave de licencia..." autocomplete="off">
                 <button type="button" id="premium-unlock-btn" class="btn btn-primary btn-unlock">🔓 Desbloquear</button>
               </div>
-              <div id="unlock-error" class="unlock-error hidden">Clave no válida. Contacta por WhatsApp para obtener tu licencia.</div>
+              <div id="unlock-error" class="unlock-error hidden">Clave no válida. Adquiere tu licencia a través de Stripe.</div>
 
               <div class="unlock-actions-row">
-                <a href="https://wa.me/34644781810?text=Hola%20Alfredo,%20deseo%20desbloquear%20el%20acceso%20a%20la%20Zona%20Premium%20de%20CriptoTracker." target="_blank" rel="noopener" class="btn btn-whatsapp">
-                  💬 Solicitar Clave por WhatsApp
-                </a>
-                <button type="button" id="premium-demo-btn" class="btn btn-demo-unlock" title="Probar el panel de análisis técnico">
-                  ✨ Probar Demo (Desbloqueo de Prueba)
+                <button type="button" class="btn-stripe-open-modal btn-open-checkout-modal" data-plan="annual">
+                  💳 Desbloquear con Stripe
+                </button>
+                <button type="button" id="premium-demo-btn" class="btn-demo-start">
+                  ✨ Iniciar Prueba Demo (7 Días)
                 </button>
               </div>
             </div>
           </div>
 
-          <!-- UNLOCKED VIEW (Visible when authenticated) -->
+          <!-- UNLOCKED VIEW (Visible when authenticated or in active trial) -->
           <div id="premium-unlocked-view" class="premium-unlocked-content hidden">
             <!-- Premium Header -->
             <div class="premium-active-header">
-              <div class="premium-status-badge">
+              <div class="premium-status-badge" id="premium-status-badge">
                 <span>👑</span> MEMBRESÍA PREMIUM ACTIVA
               </div>
-              <button type="button" id="premium-lock-again-btn" class="btn-lock-session" title="Volver a bloquear la zona premium">
+              <button type="button" id="premium-lock-again-btn" class="btn-lock-session" title="Cerrar sesión de análisis premium">
                 🔒 Bloquear de nuevo
               </button>
             </div>
@@ -488,78 +493,131 @@
         </div>
       </div>
 
-      <!-- Tab Panel: About / Developer & Commercial License -->
+      <!-- Tab Panel: Pricing & Stripe Gateway -->
       <div id="panel-about" class="tab-panel">
         <div class="developer-container">
-          <div class="developer-hero">
-            <div class="developer-badge">LICENCIA COMERCIAL & AUTORÍA</div>
-            <h1 class="developer-title">CriptoTracker Pro</h1>
-            <p class="developer-subtitle">Plataforma Profesional de Monitorización y Análisis de Mercados Cripto en Tiempo Real</p>
+          <div class="pricing-header-center">
+            <div class="premium-badge-gold">PLANES & LICENCIAS PRO</div>
+            <h1 class="pricing-title">Potencia tu Trading Cuantitativo</h1>
+            <p class="pricing-subtitle">
+              Elige el plan ideal para acceder a señales algorítmicas en tiempo real, informes institucionales diarios y simulador de trading con Stop Loss & Take Profit automatizado.
+            </p>
           </div>
 
-          <div class="developer-grid">
-            <!-- Author Card -->
-            <div class="developer-card profile-card">
-              <div class="profile-header">
-                <div class="profile-avatar">AM</div>
-                <div class="profile-details">
-                  <h2 class="profile-name">Alfredo Montañes</h2>
-                  <span class="profile-role">Creador & Desarrollador Principal</span>
-                  <div class="status-indicator"><span class="status-dot"></span> Disponible para venta, licencias y soporte</div>
-                </div>
+          <!-- 3-Tier Pricing Cards Grid -->
+          <div class="pricing-cards-grid">
+            <!-- Tier 1: Mensual -->
+            <div class="pricing-card">
+              <div class="pricing-card-header">
+                <h3 class="plan-name">Plan Pro Mensual</h3>
+                <p class="plan-desc">Flexibilidad total sin permanencia</p>
               </div>
-              <p class="profile-bio">
-                Desarrollo especializado en dashboards financieros, conexión a APIs de exchanges (Coinbase, CoinGecko) en tiempo real, análisis técnico multi-temporalidad y simuladores de trading de alto rendimiento.
-              </p>
+              <div class="plan-price-wrap">
+                <span class="plan-price-currency">$</span>
+                <span class="plan-price-number">19.99</span>
+                <span class="plan-price-period">/mes</span>
+              </div>
+              <ul class="plan-features-list">
+                <li><span class="check-icon">✓</span> Señales cuantitativas en tiempo real (RSI, MA Cross)</li>
+                <li><span class="check-icon">✓</span> Índice Fear & Greed en vivo</li>
+                <li><span class="check-icon">✓</span> Soportes y resistencias calculadas</li>
+                <li><span class="check-icon">✓</span> Simulador con Stop Loss y Take Profit</li>
+                <li><span class="check-icon">✓</span> Gráficos interactivos multi-temporalidad</li>
+              </ul>
+              <button type="button" class="btn-plan-action secondary btn-open-checkout-modal" data-plan="monthly">
+                💳 Pagar $19.99 / mes
+              </button>
             </div>
 
-            <!-- Commercial Purchase & Contact (Exclusive WhatsApp) -->
-            <div class="developer-card contact-card">
-              <h3 class="card-section-title">💼 Adquisición y Compra del Programa</h3>
-              <p class="card-section-desc">
-                Para adquirir una licencia del software, comprar el código completo o solicitar una versión personalizada para tu empresa, el canal oficial y exclusivo de contacto es a través de <strong>WhatsApp</strong>:
-              </p>
-
-              <div class="contact-methods">
-                <div class="contact-item" style="border-color: rgba(37, 211, 102, 0.4); background: rgba(37, 211, 102, 0.05);">
-                  <div class="contact-icon" style="color: #25D366; font-size: 1.8rem;">💬</div>
-                  <div class="contact-info">
-                    <span class="contact-label" style="color: #25D366; font-weight: 700;">WhatsApp Oficial de Venta</span>
-                    <a href="https://wa.me/34644781810?text=Hola%20Alfredo,%20estoy%20interesado%20en%20comprar%20el%20programa%20CriptoTracker%20Pro." target="_blank" rel="noopener" class="contact-value" id="dev-phone">+34 644 78 18 10</a>
-                  </div>
-                  <button class="btn btn-copy" data-copy="+34 644 78 18 10" type="button" title="Copiar Número de WhatsApp">📋 Copiar</button>
-                </div>
+            <!-- Tier 2: Anual (Featured) -->
+            <div class="pricing-card featured">
+              <span class="popular-badge">⭐ MÁS POPULAR</span>
+              <div class="pricing-card-header">
+                <h3 class="plan-name" style="color: #fbbf24;">Plan Pro Anual</h3>
+                <p class="plan-desc">El plan más elegido por traders activos</p>
               </div>
-
-              <div class="contact-actions">
-                <a href="https://wa.me/34644781810?text=Hola%20Alfredo,%20estoy%20interesado%20en%20comprar%20el%20programa%20CriptoTracker%20Pro." target="_blank" rel="noopener" class="btn btn-whatsapp" style="width: 100%; font-size: 1rem; padding: 14px 20px;">
-                  💬 Contactar por WhatsApp para Comprar
-                </a>
+              <div class="plan-price-wrap">
+                <span class="plan-price-currency">$</span>
+                <span class="plan-price-number">149</span>
+                <span class="plan-price-period">/año</span>
+                <div><span class="plan-savings-pill">🔥 Ahorras un 38% ($12.41/mes)</span></div>
               </div>
+              <ul class="plan-features-list">
+                <li><span class="check-icon">✓</span> <strong>Todo lo incluido en el Plan Mensual</strong></li>
+                <li><span class="check-icon">✓</span> Generador de Informes Institucionales diarios</li>
+                <li><span class="check-icon">✓</span> Radar de oportunidades y rupturas de rango</li>
+                <li><span class="check-icon">✓</span> Actualizaciones automáticas prioritarias</li>
+                <li><span class="check-icon">✓</span> Soporte técnico preferente</li>
+              </ul>
+              <button type="button" class="btn-plan-action featured-btn btn-open-checkout-modal" data-plan="annual">
+                💳 Pagar $149 / año con Stripe
+              </button>
+            </div>
+
+            <!-- Tier 3: Vitalicia -->
+            <div class="pricing-card">
+              <div class="pricing-card-header">
+                <h3 class="plan-name">Licencia Vitalicia VIP</h3>
+                <p class="plan-desc">Acceso ilimitado para siempre</p>
+              </div>
+              <div class="plan-price-wrap">
+                <span class="plan-price-currency">$</span>
+                <span class="plan-price-number">299</span>
+                <span class="plan-price-period">pago único</span>
+                <div><span class="plan-savings-pill" style="background:rgba(99,102,241,0.15);color:#a5b4fc;border-color:rgba(99,102,241,0.3);">👑 Acceso Permanente</span></div>
+              </div>
+              <ul class="plan-features-list">
+                <li><span class="check-icon">✓</span> <strong>Acceso ilimitado de por vida</strong></li>
+                <li><span class="check-icon">✓</span> Sin cuotas mensuales ni renovaciones</li>
+                <li><span class="check-icon">✓</span> Todas las características futuras incluidas</li>
+                <li><span class="check-icon">✓</span> Clave de licencia VIP personal transferible</li>
+                <li><span class="check-icon">✓</span> Soporte VIP directo</li>
+              </ul>
+              <button type="button" class="btn-plan-action primary btn-open-checkout-modal" data-plan="lifetime">
+                💳 Obtener Licencia ($299)
+              </button>
             </div>
           </div>
 
-          <!-- Feature & License Highlights -->
-          <div class="license-features-grid">
+          <!-- Stripe Trust & Security Box -->
+          <div class="stripe-trust-box">
+            <div class="stripe-trust-left">
+              <span class="stripe-logo-badge">Stripe</span>
+              <div class="stripe-trust-text">
+                <h4>🔒 Pasarela de Pago Segura con Encriptación SSL de 256 bits</h4>
+                <p>Tus datos viajan cifrados y no se almacenan en nuestros servidores. Pagos procesados por Stripe Payments Europe, Ltd.</p>
+              </div>
+            </div>
+            <div class="stripe-payment-methods">
+              <span class="card-pill">💳 Visa</span>
+              <span class="card-pill">Mastercard</span>
+              <span class="card-pill">AMEX</span>
+              <span class="card-pill">Apple Pay</span>
+              <span class="card-pill">Google Pay</span>
+            </div>
+          </div>
+
+          <!-- Feature Highlights Grid -->
+          <div class="license-features-grid" style="margin-top: var(--spacing-xl);">
             <div class="license-feature-item">
               <span class="feature-icon">⚡</span>
               <h4>Top 50 en Vivo</h4>
-              <p>Monitoreo continuo de los activos más importantes del mercado.</p>
+              <p>Monitoreo continuo de los activos con mayor volumen y capitalización.</p>
             </div>
             <div class="license-feature-item">
               <span class="feature-icon">🔥</span>
               <h4>Ganadores del Día</h4>
-              <p>Ranking de mayores subidas porcentuales estilo Coinbase.</p>
+              <p>Detección en tiempo real de mayores subidas porcentuales.</p>
+            </div>
+            <div class="license-feature-item">
+              <span class="feature-icon">🛡️</span>
+              <h4>Stop Loss & Take Profit</h4>
+              <p>Ejecución automática de órdenes para proteger beneficios y limitar riesgos.</p>
             </div>
             <div class="license-feature-item">
               <span class="feature-icon">📊</span>
-              <h4>Gráficos Interactivos</h4>
-              <p>Timeframes de 1m, 5m, 15m, 1h, 1S y 1M con cursor y crosshair.</p>
-            </div>
-            <div class="license-feature-item">
-              <span class="feature-icon">💼</span>
-              <h4>Simulador Completo</h4>
-              <p>Gestión de cartera, historial de transacciones y cálculo de P&L.</p>
+              <h4>Análisis Cuantitativo</h4>
+              <p>Señales algorítmicas, zonas de soporte/resistencia y sentimiento de mercado.</p>
             </div>
           </div>
         </div>
@@ -693,6 +751,84 @@
       </div>
     </div>
 
+    <!-- Stripe Checkout Modal -->
+    <div id="stripe-checkout-modal" class="modal-overlay hidden">
+      <div class="modal-content stripe-modal-content">
+        <button class="modal-close" id="stripe-modal-close" aria-label="Cerrar">&times;</button>
+        
+        <div class="stripe-modal-header">
+          <div class="stripe-header-title">
+            <span class="stripe-brand-tag">Stripe</span>
+            <h3>Pasarela de Pago Segura</h3>
+          </div>
+          <span style="font-size:0.75rem; color:#34d399; font-weight:600;">🔒 SSL 256-Bit</span>
+        </div>
+
+        <!-- Plan Summary -->
+        <div class="stripe-plan-summary-card">
+          <div class="plan-summary-info">
+            <h4 id="stripe-summary-plan-name">Plan Pro Anual</h4>
+            <p id="stripe-summary-plan-desc">Acceso ilimitado a todas las herramientas PRO</p>
+          </div>
+          <div class="plan-summary-price" id="stripe-summary-plan-price">$149.00</div>
+        </div>
+
+        <!-- Stripe Form -->
+        <form id="stripe-checkout-form" onsubmit="return false;">
+          <div class="stripe-field-group">
+            <label for="stripe-card-name">Titular de la Tarjeta</label>
+            <div class="stripe-input-wrapper">
+              <span class="input-icon">👤</span>
+              <input type="text" id="stripe-card-name" placeholder="Ej. Juan Pérez" required autocomplete="cc-name">
+            </div>
+          </div>
+
+          <div class="stripe-field-group">
+            <label for="stripe-card-email">Correo Electrónico para Factura</label>
+            <div class="stripe-input-wrapper">
+              <span class="input-icon">✉️</span>
+              <input type="email" id="stripe-card-email" placeholder="tu@email.com" required autocomplete="email">
+            </div>
+          </div>
+
+          <div class="stripe-field-group">
+            <label for="stripe-card-number">Número de Tarjeta</label>
+            <div class="stripe-input-wrapper">
+              <span class="input-icon">💳</span>
+              <input type="text" id="stripe-card-number" placeholder="4242  ••••  ••••  4242" maxlength="19" required autocomplete="cc-number">
+            </div>
+          </div>
+
+          <div class="stripe-card-row">
+            <div class="stripe-field-group">
+              <label for="stripe-card-exp">Caducidad</label>
+              <div class="stripe-input-wrapper">
+                <span class="input-icon">📅</span>
+                <input type="text" id="stripe-card-exp" placeholder="MM/AA" maxlength="5" required autocomplete="cc-exp">
+              </div>
+            </div>
+
+            <div class="stripe-field-group">
+              <label for="stripe-card-cvc">CVC</label>
+              <div class="stripe-input-wrapper">
+                <span class="input-icon">🔒</span>
+                <input type="password" id="stripe-card-cvc" placeholder="123" maxlength="4" required autocomplete="cc-csc">
+              </div>
+            </div>
+          </div>
+
+          <div class="stripe-guarantee-note">
+            <span>🛡️</span>
+            <span>Pago procesado con cifrado AES-256 de Stripe. Garantía de reembolso total de 14 días.</span>
+          </div>
+
+          <button type="submit" id="stripe-submit-btn" class="btn-stripe-pay">
+            🔒 Pagar <span id="stripe-btn-amount">$149.00 USD</span>
+          </button>
+        </form>
+      </div>
+    </div>
+
     <!-- Portfolio FAB -->
     <div id="portfolio-fab" class="portfolio-fab" aria-label="Ir a mi Portfolio">
       <span>💼</span> <span id="fab-value">$10,000.00</span>
@@ -702,9 +838,9 @@
     <div id="toast-container" class="toast-container"></div>
   </div>
 
-  <script src="js/api.js?v=9.0"></script>
-  <script src="js/favorites.js?v=9.0"></script>
-  <script src="js/simulator.js?v=9.0"></script>
-  <script src="js/app.js?v=9.0"></script>
+  <script src="js/api.js?v=10.0"></script>
+  <script src="js/favorites.js?v=10.0"></script>
+  <script src="js/simulator.js?v=10.0"></script>
+  <script src="js/app.js?v=10.0"></script>
 </body>
 </html>
