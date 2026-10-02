@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CriptoTracker — Dashboard de Criptomonedas en Tiempo Real</title>
+  <link rel="stylesheet" href="css/styles.css?v=8.0">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>₿</text></svg>">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <!-- Hamburger menu toggle (Visible on mobile/tablet on the left) -->
+      <button class="nav-hamburger" id="nav-hamburger" aria-label="Abrir menú de navegación" type="button">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <!-- Logo -->
+      <div class="logo">
+        <svg class="logo-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM13.5 16H11V17H9.5V16H8.5V14.5H12C12.83 14.5 13.5 13.83 13.5 13C13.5 12.17 12.83 11.5 12 11.5H9.5V9.5H8.5V8H9.5V7H11V8H12.5V9.5H9.5C8.67 9.5 8 10.17 8 11C8 11.83 8.67 12.5 9.5 12.5H12C12.83 12.5 13.5 13.17 13.5 14C13.5 14.83 12.83 15.5 12 15.5H13.5V16Z" fill="currentColor"/>
+        </svg>
+        <div>
+          <span>CriptoTracker</span>
+          <span class="logo-subtitle">Dashboard Premium</span>
+        </div>
+      </div>
+
+      <!-- Desktop Navigation Tabs (Visible on screens > 960px) -->
+      <nav class="desktop-nav-tabs">
+        <button class="tab-btn active" data-tab="top50">📊 Top 50</button>
+        <button class="tab-btn" data-tab="gainers">🔥 Ganadores</button>
+        <button class="tab-btn" data-tab="favorites">⭐ Favoritos <span id="favorites-count" class="tab-count">0</span></button>
+        <button class="tab-btn" data-tab="portfolio">💼 Portfolio</button>
+        <button class="tab-btn tab-btn-premium" data-tab="premium">💎 Análisis Premium</button>
+        <button class="tab-btn" data-tab="about">💬 WhatsApp / Comprar</button>
+      </nav>
+
+      <!-- Timestamp -->
+      <div id="last-updated" class="last-updated">Actualizado: --:--:--</div>
+    </header>
+
+    <!-- Mobile Drawer & Backdrop (Independent of header stacking context) -->
+    <div class="nav-backdrop" id="nav-backdrop"></div>
+    <aside class="mobile-drawer" id="mobile-nav-drawer" aria-label="Menú móvil">
+      <div class="mobile-drawer-header">
+        <div class="logo">
+          <svg class="logo-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM13.5 16H11V17H9.5V16H8.5V14.5H12C12.83 14.5 13.5 13.83 13.5 13C13.5 12.17 12.83 11.5 12 11.5H9.5V9.5H8.5V8H9.5V7H11V8H12.5V9.5H9.5C8.67 9.5 8 10.17 8 11C8 11.83 8.67 12.5 9.5 12.5H12C12.83 12.5 13.5 13.17 13.5 14C13.5 14.83 12.83 15.5 12 15.5H13.5V16Z" fill="currentColor"/>
+          </svg>
+          <div>
+            <span style="font-weight:800;font-size:1rem;">CriptoTracker</span>
+            <span class="logo-subtitle" style="color:#a5b4fc;font-size:0.6rem;">Menú Principal</span>
+          </div>
+        </div>
+        <button class="nav-close-btn" id="nav-close-btn" aria-label="Cerrar menú" type="button">✕</button>
+      </div>
+
+      <div class="mobile-drawer-body">
+        <button class="tab-btn active" data-tab="top50">
+          <span class="tab-icon">📊</span>
+          <span class="tab-text">Top 50 Activos</span>
+        </button>
+        <button class="tab-btn" data-tab="gainers">
+          <span class="tab-icon">🔥</span>
+          <span class="tab-text">Mayores Ganadores</span>
+        </button>
+        <button class="tab-btn" data-tab="favorites">
+          <span class="tab-icon">⭐</span>
+          <span class="tab-text">Mis Favoritos</span>
+          <span class="tab-count" style="margin-left:auto;">0</span>
+        </button>
+        <button class="tab-btn" data-tab="portfolio">
+          <span class="tab-icon">💼</span>
+          <span class="tab-text">Simulador Portfolio</span>
+        </button>
+        <button class="tab-btn tab-btn-premium" data-tab="premium">
+          <span class="tab-icon">💎</span>
+          <span class="tab-text">Análisis Premium</span>
+          <span class="badge-pro" style="margin-left:auto;font-size:0.62rem;padding:2px 6px;">VIP</span>
+        </button>
+        <button class="tab-btn" data-tab="about">
+          <span class="tab-icon">💬</span>
+          <span class="tab-text">WhatsApp / Comprar</span>
+        </button>
+      </div>
+
+      <div class="mobile-drawer-footer">
+        <a href="https://wa.me/34644781810?text=Hola,%20deseo%20comprar%20el%20programa%20CriptoTracker." target="_blank" rel="noopener" class="btn btn-whatsapp" style="width:100%;font-size:0.8rem;padding:9px 10px;gap:6px;">
+          💬 WhatsApp · Comprar: 644 78 18 10
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="search-bar">
+        <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M15.5 14H14.71L14.43 13.73C15.41 12.59 16 11.11 16 9.5C16 5.91 13.09 3 9.5 3C5.91 3 3 5.91 3 9.5C3 13.09 5.91 16 9.5 16C11.11 16 12.59 15.41 13.73 14.43L14 14.71V15.5L19 20.49L20.49 19L15.5 14ZM9.5 14C7.01 14 5 11.99 5 9.5C5 7.01 7.01 5 9.5 5C11.99 5 14 7.01 14 9.5C14 11.99 11.99 14 9.5 14Z" fill="currentColor"/>
+        </svg>
+        <input type="text" id="search-input" placeholder="Buscar criptomonedas...">
+      </div>
+
+      <!-- Tab Panels -->
+      <div id="panel-top50" class="tab-panel active">
+        <div class="crypto-list-header">
+          <span class="list-col-label">#</span>
+          <span class="list-col-label">Activo</span>
+          <span class="list-col-label">Precio</span>
+          <span class="list-col-label">24h %</span>
+          <span class="list-col-label">Cap. Mercado</span>
+          <span class="list-col-label">7 días</span>
+          <span class="list-col-label"></span>
+        </div>
+        <div id="grid-top50" class="crypto-list"></div>
+      </div>
+
+      <div id="panel-gainers" class="tab-panel">
+        <div class="crypto-list-header">
+          <span class="list-col-label">Pos.</span>
+          <span class="list-col-label">Activo</span>
+          <span class="list-col-label">Precio</span>
+          <span class="list-col-label">24h %</span>
+          <span class="list-col-label">Cap. Mercado</span>
+          <span class="list-col-label">7 días</span>
+          <span class="list-col-label"></span>
+        </div>
+        <div id="grid-gainers" class="crypto-list"></div>
+      </div>
+
+      <div id="panel-favorites" class="tab-panel">
+        <div class="crypto-list-header">
+          <span class="list-col-label">#</span>
+          <span class="list-col-label">Activo</span>
+          <span class="list-col-label">Precio</span>
+          <span class="list-col-label">24h %</span>
+          <span class="list-col-label">Cap. Mercado</span>
+          <span class="list-col-label">7 días</span>
+          <span class="list-col-label"></span>
+        </div>
+        <div id="grid-favorites" class="crypto-list"></div>
+        <div id="favorites-empty" class="empty-state hidden">
+          <div class="empty-icon">⭐</div>
+          <h3>Sin favoritos</h3>
+          <p>Marca criptomonedas con la estrella para verlas aquí</p>
+        </div>
+      </div>
+
+      <div id="panel-portfolio" class="tab-panel">
+        <div id="portfolio-hero" class="portfolio-hero">
+          <div class="portfolio-total">
+            <span class="label">Valor Total del Portafolio</span>
+            <div id="portfolio-total-value" class="portfolio-total-value">$0.00</div>
+          </div>
+          <div class="portfolio-stats">
+            <div class="portfolio-stat-item">
+              <span class="label">Balance Disponible</span>
+              <div id="portfolio-balance">$0.00</div>
+            </div>
+            <div class="portfolio-stat-item">
+              <span class="label">Valor en Activos</span>
+              <div id="portfolio-value">$0.00</div>
+            </div>
+            <div class="portfolio-stat-item">
+              <span class="label">P&L Global</span>
+              <div id="portfolio-pnl">$0.00 (0.00%)</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="portfolio-layout">
+          <div class="portfolio-left">
+            <form class="buy-form" id="buy-form" onsubmit="return false;">
+              <h3 class="form-title">Comprar Criptomoneda</h3>
+              
+              <div class="form-group">
+                <label>Buscar Cripto</label>
+                <div class="search-autocomplete">
+                  <input type="text" id="buy-search-input" class="form-control" placeholder="Buscar por nombre o símbolo..." autocomplete="off">
+                  <div id="buy-search-results" class="autocomplete-results hidden"></div>
+                </div>
+                <div class="quick-coins-chips" id="quick-coins-chips" title="Acceso rápido a monedas populares"></div>
+              </div>
+
+              <div id="selected-coin" class="selected-coin hidden">
+                <!-- Selected coin display dynamically injected -->
+              </div>
+
+              <div class="form-group">
+                <label>Cantidad en USD</label>
+                <input type="number" id="buy-amount" class="form-control" placeholder="Monto a comprar en USD" min="1" step="any">
+                <div id="buy-preview" class="buy-preview hidden"></div>
+              </div>
+
+              <!-- Stop Loss & Take Profit Configuration (Optional) -->
+              <div class="sltp-container">
+                <button type="button" class="btn-sltp-toggle" id="toggle-sltp-btn">
+                  <span class="sltp-toggle-title">🛡️ Configurar Stop Loss & Take Profit (Opcional)</span>
+                  <span class="sltp-chevron" id="sltp-chevron">▼</span>
+                </button>
+                <div class="sltp-inputs-panel hidden" id="sltp-inputs-panel">
+                  <div class="sltp-inputs-grid">
+                    <!-- Stop Loss Group -->
+                    <div class="sltp-box sl-box">
+                      <div class="sltp-box-header">
+                        <label for="buy-sl">🛡️ Stop Loss ($)</label>
+                        <span class="sltp-calc-badge" id="sl-calc-badge">—</span>
+                      </div>
+                      <input type="number" id="buy-sl" class="form-control" placeholder="Límite de pérdida en $" step="any" min="0">
+                      <div class="sltp-chips-row">
+                        <button type="button" class="sltp-chip sl-chip buy-sl-chip" data-pct="-3">-3%</button>
+                        <button type="button" class="sltp-chip sl-chip buy-sl-chip" data-pct="-5">-5%</button>
+                        <button type="button" class="sltp-chip sl-chip buy-sl-chip" data-pct="-10">-10%</button>
+                        <button type="button" class="sltp-chip sl-chip buy-sl-chip" data-pct="-15">-15%</button>
+                      </div>
+                    </div>
+
+                    <!-- Take Profit Group -->
+                    <div class="sltp-box tp-box">
+                      <div class="sltp-box-header">
+                        <label for="buy-tp">🎯 Take Profit ($)</label>
+                        <span class="sltp-calc-badge" id="tp-calc-badge">—</span>
+                      </div>
+                      <input type="number" id="buy-tp" class="form-control" placeholder="Objetivo ganancia en $" step="any" min="0">
+                      <div class="sltp-chips-row">
+                        <button type="button" class="sltp-chip tp-chip buy-tp-chip" data-pct="5">+5%</button>
+                        <button type="button" class="sltp-chip tp-chip buy-tp-chip" data-pct="10">+10%</button>
+                        <button type="button" class="sltp-chip tp-chip buy-tp-chip" data-pct="20">+20%</button>
+                        <button type="button" class="sltp-chip tp-chip buy-tp-chip" data-pct="50">+50%</button>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="sltp-note">
+                    ⚡ <em>Si el precio de mercado alcanza estos niveles, la orden se ejecutará y venderá automáticamente.</em>
+                  </div>
+                </div>
+              </div>
+
+              <button id="buy-btn" class="btn btn-primary btn-buy" type="button">🛒 Comprar Criptomoneda</button>
+            </form>
+          </div>
+
+          <div class="portfolio-right">
+            <div class="holdings-section">
+              <h3 class="section-title">Mis Posiciones</h3>
+              <div id="portfolio-holdings" class="holdings-list"></div>
+            </div>
+
+            <div class="history-section">
+              <button id="history-toggle" class="history-toggle">
+                📋 Historial de Transacciones
+                <svg class="chevron" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+              <div id="portfolio-history" class="history-list hidden"></div>
+            </div>
+
+            <button id="portfolio-reset" class="btn btn-danger btn-reset" style="margin-top: var(--spacing-lg);">🔄 Reiniciar Simulador</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab Panel: Premium Market Analysis (Locked by default) -->
+      <div id="panel-premium" class="tab-panel">
+        <div class="premium-container">
+          
+          <!-- LOCKED VIEW (Default) -->
+          <div id="premium-locked-view" class="premium-locked-card">
+            <div class="lock-glow-icon">🔒</div>
+            <div class="premium-badge-gold">EXCLUSIVO MIEMBROS VIP</div>
+            <h1 class="premium-lock-title">Zona de Análisis Cuantitativo & Señales de Mercado</h1>
+            <p class="premium-lock-subtitle">
+              Esta sección está restringida exclusivamente a usuarios Premium. Contiene algoritmos de análisis técnico en vivo, señales de trading, índice Fear & Greed en tiempo real y niveles de soporte/resistencia calculados para los principales activos.
+            </p>
+
+            <div class="premium-features-locked-grid">
+              <div class="prem-feature-box">
+                <span class="prem-icon">🎯</span>
+                <h4>Señales Algorítmicas</h4>
+                <p>Indicadores RSI, Cruces de Medias Móviles (SMA 20/50/200) y detección de momentum.</p>
+              </div>
+              <div class="prem-feature-box">
+                <span class="prem-icon">🌡️</span>
+                <h4>Fear & Greed Index en Vivo</h4>
+                <p>Medidor cuantitativo de sentimiento del mercado y psicología de masas.</p>
+              </div>
+              <div class="prem-feature-box">
+                <span class="prem-icon">🛡️</span>
+                <h4>Soportes & Resistencias</h4>
+                <p>Niveles clave de entrada y salida calculados matemáticamente para BTC, ETH, SOL y más.</p>
+              </div>
+              <div class="prem-feature-box">
+                <span class="prem-icon">📊</span>
+                <h4>Dominancia & Liquidez</h4>
+                <p>Análisis de rotación de capital institucional entre Bitcoin y el mercado de Altcoins.</p>
+              </div>
+            </div>
+
+            <!-- Unlock Form -->
+            <div class="premium-unlock-box">
+              <h3 class="unlock-title">🔑 Desbloquear Acceso a la Zona Premium</h3>
+              <p class="unlock-desc">Introduce tu clave de activación o solicita tu acceso mediante WhatsApp directo a Alfredo Montañés:</p>
+              
+              <div class="unlock-input-group">
+                <input type="password" id="premium-key-input" class="form-control" placeholder="Introduce tu clave de activación..." autocomplete="off">
+                <button type="button" id="premium-unlock-btn" class="btn btn-primary btn-unlock">🔓 Desbloquear</button>
+              </div>
+              <div id="unlock-error" class="unlock-error hidden">Clave no válida. Contacta por WhatsApp para obtener tu licencia.</div>
+
+              <div class="unlock-actions-row">
+                <a href="https://wa.me/34644781810?text=Hola%20Alfredo,%20deseo%20desbloquear%20el%20acceso%20a%20la%20Zona%20Premium%20de%20CriptoTracker." target="_blank" rel="noopener" class="btn btn-whatsapp">
+                  💬 Solicitar Clave por WhatsApp
+                </a>
+                <button type="button" id="premium-demo-btn" class="btn btn-demo-unlock" title="Probar el panel de análisis técnico">
+                  ✨ Probar Demo (Desbloqueo de Prueba)
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- UNLOCKED VIEW (Visible when authenticated) -->
+          <div id="premium-unlocked-view" class="premium-unlocked-content hidden">
+            <!-- Premium Header -->
+            <div class="premium-active-header">
+              <div class="premium-status-badge">
+                <span>👑</span> MEMBRESÍA PREMIUM ACTIVA
+              </div>
+              <button type="button" id="premium-lock-again-btn" class="btn-lock-session" title="Volver a bloquear la zona premium">
+                🔒 Bloquear de nuevo
+              </button>
+            </div>
+
+            <!-- Sentiment & Market Health Grid -->
+            <div class="premium-analytics-grid">
+              <!-- Fear & Greed Card -->
+              <div class="premium-card fear-greed-card">
+                <div class="card-header-flex">
+                  <h3>🌡️ Fear & Greed Index</h3>
+                  <span class="badge-live">EN VIVO</span>
+                </div>
+                <div class="gauge-container">
+                  <div class="gauge-value-big" id="fg-value">68</div>
+                  <div class="gauge-label-state" id="fg-label" style="color: #22c55e;">CODICIA MODERADA (Greed)</div>
+                </div>
+                <div class="meter-bar-wrapper">
+                  <div class="meter-bar-fill" style="width: 68%;"></div>
+                </div>
+                <div class="meter-scales">
+                  <span>0 Miedo Extremo</span>
+                  <span>50 Neutral</span>
+                  <span>100 Codicia Extrema</span>
+                </div>
+                <p class="card-footer-note">
+                  El sentimiento actual favorece la continuación de la tendencia alcista con baja presión de venta en exchanges.
+                </p>
+              </div>
+
+              <!-- Market Dominance Card -->
+              <div class="premium-card dominance-card">
+                <div class="card-header-flex">
+                  <h3>📊 Dominancia & Flujo Institucional</h3>
+                  <span class="badge-live">ACTUALIZADO</span>
+                </div>
+                <div class="dominance-stats-list">
+                  <div class="dom-stat-row">
+                    <span class="dom-name">Bitcoin (BTC.D)</span>
+                    <span class="dom-pct" style="color: #f59e0b;">56.8%</span>
+                  </div>
+                  <div class="meter-bar-wrapper mini"><div class="meter-bar-fill gold" style="width: 56.8%;"></div></div>
+
+                  <div class="dom-stat-row" style="margin-top: 10px;">
+                    <span class="dom-name">Ethereum (ETH.D)</span>
+                    <span class="dom-pct" style="color: #6366f1;">15.4%</span>
+                  </div>
+                  <div class="meter-bar-wrapper mini"><div class="meter-bar-fill indigo" style="width: 15.4%;"></div></div>
+
+                  <div class="dom-stat-row" style="margin-top: 10px;">
+                    <span class="dom-name">Altcoins & Stablecoins</span>
+                    <span class="dom-pct" style="color: #10b981;">27.8%</span>
+                  </div>
+                  <div class="meter-bar-wrapper mini"><div class="meter-bar-fill green" style="width: 27.8%;"></div></div>
+                </div>
+                <p class="card-footer-note">
+                  Fase de consolidación en Bitcoin. Las altcoins de gran capitalización muestran entradas de liquidez sostenida.
+                </p>
+              </div>
+            </div>
+
+            <!-- Technical Signals Table -->
+            <div class="premium-card signals-card" style="margin-top: var(--spacing-xl);">
+              <div class="card-header-flex">
+                <div>
+                  <h3 style="font-size: 1.25rem;">🎯 Señales Cuantitativas & Niveles Clave (Top Activos)</h3>
+                  <p style="font-size: 0.82rem; color: var(--text-secondary); margin-top: 2px;">Cálculo algorítmico basado en RSI (14), Medias Móviles Exponenciales y Volatilidad ATR.</p>
+                </div>
+                <span class="badge-pro">PRO SIGNALS</span>
+              </div>
+
+              <div class="signals-table-wrapper">
+                <table class="signals-table">
+                  <thead>
+                    <tr>
+                      <th>Activo</th>
+                      <th>Precio Actual</th>
+                      <th>RSI (14)</th>
+                      <th>Tendencia (EMAs)</th>
+                      <th>Soporte Clave</th>
+                      <th>Resistencia Clave</th>
+                      <th>Veredicto Algorítmico</th>
+                    </tr>
+                  </thead>
+                  <tbody id="signals-table-body">
+                    <!-- Populated dynamically via JS with real market data -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Breakout & Market Opportunities Radar -->
+            <div class="premium-card opportunities-card" style="margin-top: var(--spacing-xl);">
+              <div class="card-header-flex">
+                <h3>🚨 Radar de Oportunidades & Patrones Detectados Hoy</h3>
+                <span class="badge-live">HOY</span>
+              </div>
+              <div class="opportunities-grid" id="opportunities-grid">
+                <!-- Generated dynamically -->
+              </div>
+            </div>
+
+            <!-- Executive Macro Report -->
+            <div class="premium-card macro-report-card" style="margin-top: var(--spacing-xl);">
+              <div class="card-header-flex">
+                <h3>📑 Informe Ejecutivo Diario del Mercado</h3>
+                <span class="badge-pro">ANALYSIS v3</span>
+              </div>
+              <div class="macro-content">
+                <p>
+                  <strong>Resumen de Mercado:</strong> Los activos de primera línea mantienen una estructura técnica constructiva. La absorción de órdenes de venta en la zona de soporte institucional de Bitcoin sugiere acumulación por parte de grandes tenedores.
+                </p>
+                <div class="key-takeaways">
+                  <div class="takeaway-item">
+                    <span class="takeaway-bullet">✅</span>
+                    <span><strong>Nivel de invalidación alcista:</strong> Mantener cierres diarios por encima de soporte clave.</span>
+                  </div>
+                  <div class="takeaway-item">
+                    <span class="takeaway-bullet">⚠️</span>
+                    <span><strong>Zona de toma de beneficios:</strong> Próxima zona de resistencia técnica para rebalanceo de posiciones.</span>
+                  </div>
+                  <div class="takeaway-item">
+                    <span class="takeaway-bullet">📈</span>
+                    <span><strong>Ratio Riesgo/Beneficio:</strong> Favorable para estrategias de acumulación progresiva (DCA).</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ── Institutional Daily Report ── -->
+            <div class="premium-card report-card" style="margin-top: var(--spacing-xl);">
+              <div class="card-header-flex">
+                <div>
+                  <h3 style="font-size: 1.25rem;">📊 Informe Diario Institucional</h3>
+                  <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 3px;">
+                    Análisis cuantitativo generado automáticamente con datos de mercado en tiempo real
+                  </p>
+                </div>
+                <div style="display:flex; gap: 8px; align-items: center; flex-shrink:0;">
+                  <span class="badge-live">AUTO-GEN</span>
+                  <button type="button" id="generate-report-btn" class="btn btn-generate-report">
+                    ⚡ Generar Informe
+                  </button>
+                </div>
+              </div>
+
+              <!-- Report output area -->
+              <div id="report-output" class="report-output">
+                <div class="report-placeholder">
+                  <div class="report-placeholder-icon">📋</div>
+                  <p>Haz clic en <strong>⚡ Generar Informe</strong> para producir el análisis institucional del mercado con los datos en tiempo real cargados en la plataforma.</p>
+                  <p style="font-size: 0.78rem; margin-top: 6px; color: var(--text-muted);">El informe se actualiza con cada regeneración usando los precios y métricas más recientes.</p>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Tab Panel: About / Developer & Commercial License -->
+      <div id="panel-about" class="tab-panel">
+        <div class="developer-container">
+          <div class="developer-hero">
+            <div class="developer-badge">LICENCIA COMERCIAL & AUTORÍA</div>
+            <h1 class="developer-title">CriptoTracker Pro</h1>
+            <p class="developer-subtitle">Plataforma Profesional de Monitorización y Análisis de Mercados Cripto en Tiempo Real</p>
+          </div>
+
+          <div class="developer-grid">
+            <!-- Author Card -->
+            <div class="developer-card profile-card">
+              <div class="profile-header">
+                <div class="profile-avatar">AM</div>
+                <div class="profile-details">
+                  <h2 class="profile-name">Alfredo Montañes</h2>
+                  <span class="profile-role">Creador & Desarrollador Principal</span>
+                  <div class="status-indicator"><span class="status-dot"></span> Disponible para venta, licencias y soporte</div>
+                </div>
+              </div>
+              <p class="profile-bio">
+                Desarrollo especializado en dashboards financieros, conexión a APIs de exchanges (Coinbase, CoinGecko) en tiempo real, análisis técnico multi-temporalidad y simuladores de trading de alto rendimiento.
+              </p>
+            </div>
+
+            <!-- Commercial Purchase & Contact (Exclusive WhatsApp) -->
+            <div class="developer-card contact-card">
+              <h3 class="card-section-title">💼 Adquisición y Compra del Programa</h3>
+              <p class="card-section-desc">
+                Para adquirir una licencia del software, comprar el código completo o solicitar una versión personalizada para tu empresa, el canal oficial y exclusivo de contacto es a través de <strong>WhatsApp</strong>:
+              </p>
+
+              <div class="contact-methods">
+                <div class="contact-item" style="border-color: rgba(37, 211, 102, 0.4); background: rgba(37, 211, 102, 0.05);">
+                  <div class="contact-icon" style="color: #25D366; font-size: 1.8rem;">💬</div>
+                  <div class="contact-info">
+                    <span class="contact-label" style="color: #25D366; font-weight: 700;">WhatsApp Oficial de Venta</span>
+                    <a href="https://wa.me/34644781810?text=Hola%20Alfredo,%20estoy%20interesado%20en%20comprar%20el%20programa%20CriptoTracker%20Pro." target="_blank" rel="noopener" class="contact-value" id="dev-phone">+34 644 78 18 10</a>
+                  </div>
+                  <button class="btn btn-copy" data-copy="+34 644 78 18 10" type="button" title="Copiar Número de WhatsApp">📋 Copiar</button>
+                </div>
+              </div>
+
+              <div class="contact-actions">
+                <a href="https://wa.me/34644781810?text=Hola%20Alfredo,%20estoy%20interesado%20en%20comprar%20el%20programa%20CriptoTracker%20Pro." target="_blank" rel="noopener" class="btn btn-whatsapp" style="width: 100%; font-size: 1rem; padding: 14px 20px;">
+                  💬 Contactar por WhatsApp para Comprar
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Feature & License Highlights -->
+          <div class="license-features-grid">
+            <div class="license-feature-item">
+              <span class="feature-icon">⚡</span>
+              <h4>Top 50 en Vivo</h4>
+              <p>Monitoreo continuo de los activos más importantes del mercado.</p>
+            </div>
+            <div class="license-feature-item">
+              <span class="feature-icon">🔥</span>
+              <h4>Ganadores del Día</h4>
+              <p>Ranking de mayores subidas porcentuales estilo Coinbase.</p>
+            </div>
+            <div class="license-feature-item">
+              <span class="feature-icon">📊</span>
+              <h4>Gráficos Interactivos</h4>
+              <p>Timeframes de 1m, 5m, 15m, 1h, 1S y 1M con cursor y crosshair.</p>
+            </div>
+            <div class="license-feature-item">
+              <span class="feature-icon">💼</span>
+              <h4>Simulador Completo</h4>
+              <p>Gestión de cartera, historial de transacciones y cálculo de P&L.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Modal Detail & Multi-timeframe Chart -->
+    <div id="coin-modal" class="modal-overlay hidden">
+      <div class="modal-content">
+        <button class="modal-close" aria-label="Cerrar">&times;</button>
+        <div class="modal-header">
+          <img id="modal-coin-img" src="" alt="Coin" class="modal-coin-img">
+          <div class="modal-coin-info">
+            <h2 id="modal-coin-name"></h2>
+            <span id="modal-coin-symbol" class="modal-symbol"></span>
+          </div>
+        </div>
+        <div class="modal-body">
+          <div class="modal-stats-grid">
+            <div class="modal-stat">
+              <span class="stat-label">Precio</span>
+              <span id="modal-price" class="stat-value"></span>
+            </div>
+            <div class="modal-stat">
+              <span class="stat-label">Cambio 24h</span>
+              <span id="modal-change" class="stat-value"></span>
+            </div>
+            <div class="modal-stat">
+              <span class="stat-label">Cap. Mercado</span>
+              <span id="modal-mcap" class="stat-value"></span>
+            </div>
+            <div class="modal-stat">
+              <span class="stat-label">Volumen 24h</span>
+              <span id="modal-volume" class="stat-value"></span>
+            </div>
+            <div class="modal-stat">
+              <span class="stat-label">ATH</span>
+              <span id="modal-ath" class="stat-value"></span>
+            </div>
+          </div>
+          
+          <div class="chart-section">
+            <h3 class="section-title">Evolución de Precio</h3>
+            <div class="timeframe-buttons">
+              <button class="tf-btn" data-tf="1m">1 Min</button>
+              <button class="tf-btn" data-tf="5m">5 Min</button>
+              <button class="tf-btn" data-tf="15m">15 Min</button>
+              <button class="tf-btn active" data-tf="1h">1 Hora</button>
+              <button class="tf-btn" data-tf="1S">1 Sem</button>
+              <button class="tf-btn" data-tf="1M">1 Mes</button>
+            </div>
+            <div class="chart-container">
+              <canvas id="chart-canvas" class="chart-canvas" width="600" height="250"></canvas>
+              <div id="chart-tooltip" class="chart-tooltip"></div>
+              <div id="chart-loading" class="chart-loading hidden">
+                <div class="spinner"></div>
+              </div>
+            </div>
+          </div>
+          
+          <button id="modal-buy-btn" class="btn btn-primary modal-buy-btn">🛒 Comprar esta cripto</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit Stop Loss / Take Profit Modal -->
+    <div id="edit-sltp-modal" class="modal-overlay hidden">
+      <div class="modal-content sltp-modal-content">
+        <button class="modal-close" id="edit-sltp-close">&times;</button>
+        <div class="modal-header">
+          <img id="edit-sltp-coin-img" src="" alt="" class="modal-coin-icon">
+          <div>
+            <h2 id="edit-sltp-coin-name" style="font-size:1.25rem;">Configurar SL / TP</h2>
+            <span id="edit-sltp-coin-symbol" class="modal-coin-symbol"></span>
+          </div>
+        </div>
+
+        <div class="edit-sltp-body" style="margin-top:14px;">
+          <div class="current-price-info-card">
+            <div class="price-info-item">
+              <span class="info-label">Precio Actual:</span>
+              <strong id="edit-sltp-current-price" class="info-value">$0.00</strong>
+            </div>
+            <div class="price-info-item">
+              <span class="info-label">Precio de Compra:</span>
+              <strong id="edit-sltp-buy-price" class="info-value">$0.00</strong>
+            </div>
+          </div>
+
+          <div class="sltp-inputs-grid" style="margin-top: 14px;">
+            <!-- Stop Loss -->
+            <div class="sltp-box sl-box">
+              <div class="sltp-box-header">
+                <label for="edit-sl-input">🛡️ Stop Loss ($)</label>
+                <span class="sltp-calc-badge" id="edit-sl-badge">—</span>
+              </div>
+              <input type="number" id="edit-sl-input" class="form-control" placeholder="Sin Stop Loss" step="any" min="0">
+              <div class="sltp-chips-row">
+                <button type="button" class="sltp-chip sl-chip edit-sl-chip" data-pct="-3">-3%</button>
+                <button type="button" class="sltp-chip sl-chip edit-sl-chip" data-pct="-5">-5%</button>
+                <button type="button" class="sltp-chip sl-chip edit-sl-chip" data-pct="-10">-10%</button>
+                <button type="button" class="sltp-chip sl-chip edit-sl-chip-clear" style="color:var(--text-muted);" title="Quitar Stop Loss">✕</button>
+              </div>
+            </div>
+
+            <!-- Take Profit -->
+            <div class="sltp-box tp-box">
+              <div class="sltp-box-header">
+                <label for="edit-tp-input">🎯 Take Profit ($)</label>
+                <span class="sltp-calc-badge" id="edit-tp-badge">—</span>
+              </div>
+              <input type="number" id="edit-tp-input" class="form-control" placeholder="Sin Take Profit" step="any" min="0">
+              <div class="sltp-chips-row">
+                <button type="button" class="sltp-chip tp-chip edit-tp-chip" data-pct="5">+5%</button>
+                <button type="button" class="sltp-chip tp-chip edit-tp-chip" data-pct="10">+10%</button>
+                <button type="button" class="sltp-chip tp-chip edit-tp-chip" data-pct="25">+25%</button>
+                <button type="button" class="sltp-chip tp-chip edit-tp-chip-clear" style="color:var(--text-muted);" title="Quitar Take Profit">✕</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="sltp-note" style="margin-top:10px;">
+            ⚡ <em>Las órdenes se ejecutan y cierran la posición automáticamente en cuanto el mercado alcance estos precios.</em>
+          </div>
+
+          <div class="modal-actions-row" style="margin-top: 16px; display:flex; gap:10px;">
+            <button type="button" id="save-sltp-btn" class="btn btn-primary" style="flex:1;">💾 Guardar Objetivos</button>
+            <button type="button" id="cancel-sltp-btn" class="btn btn-secondary" style="background:rgba(255,255,255,0.06);color:var(--text-secondary);">Cancelar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Portfolio FAB -->
+    <div id="portfolio-fab" class="portfolio-fab" aria-label="Ir a mi Portfolio">
+      <span>💼</span> <span id="fab-value">$10,000.00</span>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="toast-container"></div>
+  </div>
+
+  <script src="js/api.js?v=9.0"></script>
+  <script src="js/favorites.js?v=9.0"></script>
+  <script src="js/simulator.js?v=9.0"></script>
+  <script src="js/app.js?v=9.0"></script>
+</body>
+</html>
