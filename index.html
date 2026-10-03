@@ -751,6 +751,79 @@
       </div>
     </div>
 
+    <!-- Sell Holding Modal (Vender parcial o total) -->
+    <div id="sell-modal" class="modal-overlay hidden">
+      <div class="modal-content sell-modal-content" style="max-width: 480px;">
+        <button class="modal-close" id="sell-modal-close" aria-label="Cerrar">&times;</button>
+        <div class="modal-header">
+          <img id="sell-modal-coin-img" src="" alt="" class="modal-coin-icon">
+          <div>
+            <h2 id="sell-modal-coin-name" style="font-size:1.25rem;">Vender Criptomoneda</h2>
+            <span id="sell-modal-coin-symbol" class="modal-coin-symbol"></span>
+          </div>
+        </div>
+
+        <div class="sell-modal-body" style="margin-top:14px;">
+          <!-- Price and Holdings Info -->
+          <div class="current-price-info-card">
+            <div class="price-info-item">
+              <span class="info-label">Precio Actual:</span>
+              <strong id="sell-modal-current-price" class="info-value">$0.00</strong>
+            </div>
+            <div class="price-info-item">
+              <span class="info-label">En Cartera:</span>
+              <strong id="sell-modal-total-holding" class="info-value">0.00</strong>
+            </div>
+            <div class="price-info-item">
+              <span class="info-label">Valor Total:</span>
+              <strong id="sell-modal-total-value" class="info-value">$0.00</strong>
+            </div>
+          </div>
+
+          <!-- Sell Amount Input -->
+          <div style="margin-top: 16px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <label for="sell-token-amount-input" style="font-size:0.85rem; font-weight:600; color:var(--text-secondary);">Cantidad a vender:</label>
+              <span id="sell-pct-indicator" style="font-size:0.8rem; font-weight:700; color:var(--primary-accent);">100%</span>
+            </div>
+            <div style="position:relative; display:flex; align-items:center;">
+              <input type="number" id="sell-token-amount-input" class="form-control" placeholder="0.00" step="any" min="0" style="padding-right: 70px; font-size:1.05rem; font-weight:600;">
+              <span id="sell-input-symbol-badge" style="position:absolute; right:12px; font-size:0.8rem; font-weight:700; color:var(--text-muted); pointer-events:none;">BTC</span>
+            </div>
+          </div>
+
+          <!-- Quick Percentage Chips -->
+          <div class="sltp-chips-row" style="margin-top: 10px; display:flex; gap:8px;">
+            <button type="button" class="sltp-chip sell-pct-chip" data-pct="25" style="flex:1;">25%</button>
+            <button type="button" class="sltp-chip sell-pct-chip" data-pct="50" style="flex:1;">50%</button>
+            <button type="button" class="sltp-chip sell-pct-chip" data-pct="75" style="flex:1;">75%</button>
+            <button type="button" class="sltp-chip sell-pct-chip" data-pct="100" style="flex:1; background:rgba(239,68,68,0.18); border-color:#ef4444; color:#ef4444; font-weight:700;">100% (Todo)</button>
+          </div>
+
+          <!-- Live Calculation Summary Card -->
+          <div class="sell-summary-card" style="margin-top: 16px; background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.08); border-radius:var(--border-radius-sm); padding:12px 14px;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+              <span style="font-size:0.82rem; color:var(--text-muted);">Total a recibir:</span>
+              <strong id="sell-receive-usd" style="font-size:0.95rem; color:#22c55e;">$0.00 USD</strong>
+            </div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+              <span style="font-size:0.82rem; color:var(--text-muted);">PnL estimado (Ganancia/Pérdida):</span>
+              <strong id="sell-estimated-pnl" style="font-size:0.85rem; color:var(--text-primary);">—</strong>
+            </div>
+            <div style="display:flex; justify-content:space-between;">
+              <span style="font-size:0.82rem; color:var(--text-muted);">Saldo restante en cartera:</span>
+              <span id="sell-remaining-holding" style="font-size:0.82rem; color:var(--text-secondary);">0.00</span>
+            </div>
+          </div>
+
+          <div class="modal-actions-row" style="margin-top: 18px; display:flex; gap:10px;">
+            <button type="button" id="confirm-sell-btn" class="btn btn-danger" style="flex:1; background:#ef4444; color:#fff; border:none; padding:12px; font-weight:700; cursor:pointer; border-radius:var(--border-radius-sm);">🔥 Confirmar Venta</button>
+            <button type="button" id="cancel-sell-btn" class="btn btn-secondary" style="background:rgba(255,255,255,0.06); color:var(--text-secondary); border:1px solid rgba(255,255,255,0.1); padding:12px 16px; cursor:pointer; border-radius:var(--border-radius-sm);">Cancelar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Stripe Checkout Modal -->
     <div id="stripe-checkout-modal" class="modal-overlay hidden">
       <div class="modal-content stripe-modal-content">

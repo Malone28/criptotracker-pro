@@ -86,6 +86,24 @@
       saveSltpBtn: document.getElementById('save-sltp-btn'),
       cancelSltpBtn: document.getElementById('cancel-sltp-btn'),
 
+      // Sell Modal
+      sellModal: document.getElementById('sell-modal'),
+      sellModalClose: document.getElementById('sell-modal-close'),
+      sellModalCoinImg: document.getElementById('sell-modal-coin-img'),
+      sellModalCoinName: document.getElementById('sell-modal-coin-name'),
+      sellModalCoinSymbol: document.getElementById('sell-modal-coin-symbol'),
+      sellModalCurrentPrice: document.getElementById('sell-modal-current-price'),
+      sellModalTotalHolding: document.getElementById('sell-modal-total-holding'),
+      sellModalTotalValue: document.getElementById('sell-modal-total-value'),
+      sellTokenAmountInput: document.getElementById('sell-token-amount-input'),
+      sellInputSymbolBadge: document.getElementById('sell-input-symbol-badge'),
+      sellPctIndicator: document.getElementById('sell-pct-indicator'),
+      sellReceiveUsd: document.getElementById('sell-receive-usd'),
+      sellEstimatedPnl: document.getElementById('sell-estimated-pnl'),
+      sellRemainingHolding: document.getElementById('sell-remaining-holding'),
+      confirmSellBtn: document.getElementById('confirm-sell-btn'),
+      cancelSellBtn: document.getElementById('cancel-sell-btn'),
+
       coinModal: document.getElementById('coin-modal'),
       modalClose: document.querySelector('.modal-close'),
       modalCoinImg: document.getElementById('modal-coin-img'),
@@ -439,7 +457,7 @@
               targetsHtml +
             '</div>' +
             '<div class="holding-actions">' +
-              '<button class="sell-btn" data-coin-id="' + h.coinId + '" data-amount="' + h.amount + '" type="button">Vender Todo</button>' +
+              '<button class="sell-btn" data-coin-id="' + h.coinId + '" data-amount="' + h.amount + '" type="button">Vender</button>' +
               '<button class="btn-edit-sltp" data-coin-id="' + h.coinId + '" type="button">⚙️ SL / TP</button>' +
             '</div>' +
           '</div>';
@@ -1500,6 +1518,117 @@
     currentEditingHolding = null;
   }
 
+  let currentSellingHolding = null;
+
+  function openSellModal(coinId) {
+    if (!window.Simulator || !els.sellModal) return;
+    const holdings = window.Simulator.getHoldings();
+    const holding = holdings.find(h => h.coinId === coinId);
+    if (!holding) return;
+
+    const prices = getCurrentPrices();
+    const currentPrice = prices[coinId] || holding.buyPrice;
+    currentSellingHolding = Object.assign({}, holding, { currentPrice });
+
+    if (els.sellModalCoinImg) els.sellModalCoinImg.src = holding.coinImage || 'https://via.placeholder.com/36';
+    if (els.sellModalCoinName) els.sellModalCoinName.textContent = holding.coinName;
+    if (els.sellModalCoinSymbol) els.sellModalCoinSymbol.textContent = (holding.coinSymbol || '').toUpperCase();
+    if (els.sellModalCurrentPrice) els.sellModalCurrentPrice.textContent = formatPrice(currentPrice);
+    if (els.sellModalTotalHolding) els.sellModalTotalHolding.textContent = holding.amount.toLocaleString(undefined, { maximumFractionDigits: 6 }) + ' ' + (holding.coinSymbol || '').toUpperCase();
+    if (els.sellModalTotalValue) els.sellModalTotalValue.textContent = formatPrice(holding.amount * currentPrice);
+    if (els.sellInputSymbolBadge) els.sellInputSymbolBadge.textContent = (holding.coinSymbol || '').toUpperCase();
+
+    // Default to 100% of holdings
+    if (els.sellTokenAmountInput) {
+      els.sellTokenAmountInput.value = holding.amount;
+      els.sellTokenAmountInput.max = holding.amount;
+    }
+
+    updateSellCalculations();
+    highlightSellChip(100);
+
+    els.sellModal.classList.remove('hidden');
+    if (els.sellTokenAmountInput) els.sellTokenAmountInput.focus();
+  }
+
+  function closeSellModal() {
+    if (els.sellModal) els.sellModal.classList.add('hidden');
+    currentSellingHolding = null;
+  }
+
+  function updateSellCalculations() {
+    if (!currentSellingHolding) return;
+    const totalAmount = currentSellingHolding.amount;
+    const currentPrice = currentSellingHolding.currentPrice;
+    const buyPrice = currentSellingHolding.buyPrice;
+    const symbol = (currentSellingHolding.coinSymbol || '').toUpperCase();
+
+    let sellAmount = parseFloat(els.sellTokenAmountInput ? els.sellTokenAmountInput.value : 0);
+    if (isNaN(sellAmount) || sellAmount < 0) sellAmount = 0;
+
+    const pct = totalAmount > 0 ? Math.min(100, (sellAmount / totalAmount) * 100) : 0;
+    if (els.sellPctIndicator) {
+      els.sellPctIndicator.textContent = pct.toFixed(0) + '%';
+    }
+
+    const receiveUsd = sellAmount * currentPrice;
+    if (els.sellReceiveUsd) {
+      els.sellReceiveUsd.textContent = formatPrice(receiveUsd) + ' USD';
+    }
+
+    const pnlUsd = (currentPrice - buyPrice) * sellAmount;
+    const pnlPct = buyPrice > 0 ? ((currentPrice - buyPrice) / buyPrice) * 100 : 0;
+    if (els.sellEstimatedPnl) {
+      if (sellAmount <= 0) {
+        els.sellEstimatedPnl.textContent = '—';
+        els.sellEstimatedPnl.style.color = 'var(--text-muted)';
+      } else {
+        const sign = pnlUsd >= 0 ? '+' : '';
+        const color = pnlUsd >= 0 ? '#22c55e' : '#ef4444';
+        els.sellEstimatedPnl.innerHTML = '<span style="color:' + color + ';font-weight:700;">' + sign + formatPrice(pnlUsd) + ' (' + sign + pnlPct.toFixed(2) + '%)</span>';
+      }
+    }
+
+    const remaining = Math.max(0, totalAmount - sellAmount);
+    if (els.sellRemainingHolding) {
+      els.sellRemainingHolding.textContent = remaining.toLocaleString(undefined, { maximumFractionDigits: 6 }) + ' ' + symbol;
+    }
+
+    if (els.confirmSellBtn) {
+      if (sellAmount <= 0) {
+        els.confirmSellBtn.disabled = true;
+        els.confirmSellBtn.textContent = 'Introduce cantidad';
+        els.confirmSellBtn.style.opacity = '0.5';
+      } else if (sellAmount > totalAmount * 1.000001) {
+        els.confirmSellBtn.disabled = true;
+        els.confirmSellBtn.textContent = 'Cantidad superior a saldo disponible';
+        els.confirmSellBtn.style.opacity = '0.5';
+      } else {
+        els.confirmSellBtn.disabled = false;
+        els.confirmSellBtn.style.opacity = '1';
+        const displayAmt = sellAmount.toLocaleString(undefined, { maximumFractionDigits: 4 });
+        els.confirmSellBtn.textContent = '🔥 Vender ' + displayAmt + ' ' + symbol + ' (' + formatPrice(receiveUsd) + ')';
+      }
+    }
+  }
+
+  function highlightSellChip(pct) {
+    document.querySelectorAll('.sell-pct-chip').forEach(function(chip) {
+      const chipPct = parseFloat(chip.dataset.pct);
+      if (Math.abs(chipPct - pct) < 1) {
+        chip.style.background = 'rgba(239,68,68,0.2)';
+        chip.style.borderColor = '#ef4444';
+        chip.style.color = '#ef4444';
+        chip.style.fontWeight = '700';
+      } else {
+        chip.style.background = 'rgba(255,255,255,0.06)';
+        chip.style.borderColor = 'rgba(255,255,255,0.1)';
+        chip.style.color = 'var(--text-secondary)';
+        chip.style.fontWeight = '500';
+      }
+    });
+  }
+
   function deselectBuyCoin() {
     selectedBuyCoin = null;
     if (els.selectedCoin) {
@@ -1924,7 +2053,7 @@
 
     // Sell holdings and edit SL/TP delegate
     if (els.portfolioHoldings) {
-      els.portfolioHoldings.addEventListener('click', async function(e) {
+      els.portfolioHoldings.addEventListener('click', function(e) {
         const editBtn = e.target.closest('.btn-edit-sltp');
         if (editBtn) {
           const coinId = editBtn.dataset.coinId;
@@ -1936,29 +2065,65 @@
         if (!btn) return;
 
         const id = btn.dataset.coinId;
-        const amount = parseFloat(btn.dataset.amount);
-        const prices = getCurrentPrices();
+        openSellModal(id);
+      });
+    }
 
-        let price = prices[id];
-        if (!price) {
-          try {
-            const detail = await window.CryptoAPI.fetchCoinDetail(id);
-            price = detail ? detail.current_price : 0;
-          } catch(err){}
+    // Sell Modal Event Listeners
+    if (els.sellTokenAmountInput) {
+      els.sellTokenAmountInput.addEventListener('input', function() {
+        updateSellCalculations();
+        if (currentSellingHolding && currentSellingHolding.amount > 0) {
+          const val = parseFloat(this.value) || 0;
+          const pct = (val / currentSellingHolding.amount) * 100;
+          highlightSellChip(pct);
         }
+      });
+    }
 
-        if (!price || isNaN(price) || price <= 0) {
-          showToast('No se pudo determinar el precio actual de mercado', 'error');
+    document.querySelectorAll('.sell-pct-chip').forEach(function(chip) {
+      chip.addEventListener('click', function() {
+        if (!currentSellingHolding || !els.sellTokenAmountInput) return;
+        const pct = parseFloat(this.dataset.pct);
+        const amt = currentSellingHolding.amount * (pct / 100);
+        els.sellTokenAmountInput.value = amt;
+        updateSellCalculations();
+        highlightSellChip(pct);
+      });
+    });
+
+    if (els.confirmSellBtn) {
+      els.confirmSellBtn.addEventListener('click', function() {
+        if (!currentSellingHolding || !window.Simulator) return;
+        const sellAmount = parseFloat(els.sellTokenAmountInput ? els.sellTokenAmountInput.value : 0);
+        if (isNaN(sellAmount) || sellAmount <= 0) {
+          showToast('Introduce una cantidad válida a vender', 'error');
+          return;
+        }
+        if (sellAmount > currentSellingHolding.amount * 1.000001) {
+          showToast('No tienes suficiente saldo disponible en cartera', 'error');
           return;
         }
 
-        const result = window.Simulator.sell(id, amount, price);
+        const coinId = currentSellingHolding.coinId;
+        const price = currentSellingHolding.currentPrice;
+        const result = window.Simulator.sell(coinId, sellAmount, price);
+
         if (result.success) {
           showToast(result.message, 'success');
+          closeSellModal();
           renderPortfolio();
         } else {
           showToast(result.message || 'Error al vender', 'error');
         }
+      });
+    }
+
+    if (els.sellModalClose) els.sellModalClose.addEventListener('click', closeSellModal);
+    if (els.cancelSellBtn) els.cancelSellBtn.addEventListener('click', closeSellModal);
+    if (els.sellModal) {
+      els.sellModal.addEventListener('click', function(e) {
+        if (e.target === els.sellModal) closeSellModal();
       });
     }
 
