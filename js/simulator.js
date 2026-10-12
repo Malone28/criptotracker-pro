@@ -9,17 +9,33 @@ window.Simulator = (function() {
   let balance = INITIAL_BALANCE;
   let holdings = [];  
   let history = [];   
+
+  // Bilingual message helper (English default)
+  function L(en, es) {
+    return (window.I18n && window.I18n.getLanguage() === 'es') ? es : en;
+  }
   
   function load() {
     try {
       const storedBalance = localStorage.getItem(STORAGE_KEY_BALANCE);
-      if (storedBalance !== null) balance = parseFloat(storedBalance);
+      if (storedBalance !== null) {
+        const parsed = parseFloat(storedBalance);
+        balance = (isFinite(parsed) && parsed >= 0) ? parsed : INITIAL_BALANCE;
+      }
       
       const storedHoldings = localStorage.getItem(STORAGE_KEY_HOLDINGS);
-      if (storedHoldings) holdings = JSON.parse(storedHoldings);
+      if (storedHoldings) {
+        const parsedH = JSON.parse(storedHoldings);
+        holdings = Array.isArray(parsedH)
+          ? parsedH.filter(h => h && h.coinId && isFinite(h.amount) && h.amount > 0 && isFinite(h.buyPrice))
+          : [];
+      }
       
       const storedHistory = localStorage.getItem(STORAGE_KEY_HISTORY);
-      if (storedHistory) history = JSON.parse(storedHistory);
+      if (storedHistory) {
+        const parsedHist = JSON.parse(storedHistory);
+        history = Array.isArray(parsedHist) ? parsedHist : [];
+      }
     } catch (e) {
       console.warn("Failed to load simulator data:", e);
       balance = INITIAL_BALANCE;
@@ -33,6 +49,9 @@ window.Simulator = (function() {
       localStorage.setItem(STORAGE_KEY_BALANCE, balance.toString());
       localStorage.setItem(STORAGE_KEY_HOLDINGS, JSON.stringify(holdings));
       localStorage.setItem(STORAGE_KEY_HISTORY, JSON.stringify(history));
+      if (window.CriptoAuth && window.CriptoAuth.saveCloudData) {
+        window.CriptoAuth.saveCloudData();
+      }
     } catch (e) {
       console.error("Failed to save simulator data:", e);
     }
@@ -45,9 +64,9 @@ window.Simulator = (function() {
   function getHistory() { return history; }
   
   function buy(coinId, coinName, coinSymbol, coinImage, amountUSD, pricePerCoin, stopLoss, takeProfit) {
-    if (amountUSD <= 0) return { success: false, message: "El monto debe ser mayor a 0" };
-    if (amountUSD > balance) return { success: false, message: "Saldo insuficiente" };
-    if (pricePerCoin <= 0) return { success: false, message: "Precio de activo inválido" };
+    if (amountUSD <= 0) return { success: false, message: L("Amount must be greater than 0", "El monto debe ser mayor a 0") };
+    if (amountUSD > balance) return { success: false, message: L("Insufficient balance", "Saldo insuficiente") };
+    if (pricePerCoin <= 0) return { success: false, message: L("Invalid asset price", "Precio de activo inválido") };
     
     const tokens = amountUSD / pricePerCoin;
     balance -= amountUSD;
@@ -81,37 +100,41 @@ window.Simulator = (function() {
     });
     
     save();
-    return { success: true, tokens, message: `Compra exitosa: +${tokens.toFixed(6)} ${coinSymbol.toUpperCase()}` };
+    return { success: true, tokens, message: L(`Purchase successful: +${tokens.toFixed(6)} ${String(coinSymbol || '').toUpperCase()}`, `Compra exitosa: +${tokens.toFixed(6)} ${String(coinSymbol || '').toUpperCase()}`) };
   }
   
   function setHoldingTargets(coinId, stopLoss, takeProfit) {
     const holding = holdings.find(h => h.coinId === coinId);
-    if (!holding) return { success: false, message: "Posición no encontrada en cartera" };
+    if (!holding) return { success: false, message: L("Position not found in portfolio", "Posición no encontrada en cartera") };
     
     holding.stopLoss = (stopLoss !== null && stopLoss !== undefined && !isNaN(stopLoss) && Number(stopLoss) > 0) ? Number(stopLoss) : null;
     holding.takeProfit = (takeProfit !== null && takeProfit !== undefined && !isNaN(takeProfit) && Number(takeProfit) > 0) ? Number(takeProfit) : null;
     
     save();
-    return { success: true, message: `Objetivos SL/TP actualizados para ${holding.coinName}` };
+    return { success: true, message: L(`SL/TP targets updated for ${holding.coinName}`, `Objetivos SL/TP actualizados para ${holding.coinName}`) };
   }
   
   function sell(coinId, amountTokens, pricePerCoin) {
-    if (amountTokens <= 0) return { success: false, message: "La cantidad debe ser mayor a 0" };
-    if (pricePerCoin <= 0) return { success: false, message: "Precio de activo inválido" };
+    if (amountTokens <= 0) return { success: false, message: L("Amount must be greater than 0", "La cantidad debe ser mayor a 0") };
+    if (pricePerCoin <= 0) return { success: false, message: L("Invalid asset price", "Precio de activo inválido") };
     
     const index = holdings.findIndex(h => h.coinId === coinId);
-    if (index === -1) return { success: false, message: "Criptomoneda no encontrada en cartera" };
+    if (index === -1) return { success: false, message: L("Cryptocurrency not found in portfolio", "Criptomoneda no encontrada en cartera") };
     
     const holding = holdings[index];
-    if (amountTokens > holding.amount) return { success: false, message: "Cantidad de tokens insuficiente" };
+    // Floating-point tolerance: amounts within 0.0001% of the full position count as "sell all"
+    if (amountTokens > holding.amount * 1.000001) return { success: false, message: L("Insufficient token amount", "Cantidad de tokens insuficiente") };
+    if (amountTokens > holding.amount) amountTokens = holding.amount;
     
     const totalUSD = amountTokens * pricePerCoin;
     const pnlUSD = (pricePerCoin - holding.buyPrice) * amountTokens;
     const pnlPercent = holding.buyPrice > 0 ? ((pricePerCoin - holding.buyPrice) / holding.buyPrice) * 100 : 0;
     balance += totalUSD;
     
+    const originalAmount = holding.amount;
     holding.amount -= amountTokens;
-    if (holding.amount <= 0.0000001) {
+    // Remove "dust" leftovers (relative to position size, so it works for both BTC and SHIB-like tokens)
+    if (holding.amount <= originalAmount * 1e-9 || holding.amount * pricePerCoin < 0.000001) {
       holdings.splice(index, 1);
     }
     
@@ -123,7 +146,7 @@ window.Simulator = (function() {
     });
     
     save();
-    return { success: true, totalUSD, message: `Venta exitosa: ${amountTokens.toFixed(6)} ${holding.coinSymbol.toUpperCase()} por $${totalUSD.toFixed(2)} USD` };
+    return { success: true, totalUSD, message: L(`Sale successful: ${amountTokens.toFixed(6)} ${String(holding.coinSymbol || '').toUpperCase()} for $${totalUSD.toFixed(2)} USD`, `Venta exitosa: ${amountTokens.toFixed(6)} ${String(holding.coinSymbol || '').toUpperCase()} por $${totalUSD.toFixed(2)} USD`) };
   }
   
   function checkTriggers(currentPrices) {
@@ -266,7 +289,8 @@ window.Simulator = (function() {
     getPortfolioValue, 
     getPnL, 
     getHoldingPnL, 
-    reset 
+    reset,
+    reload: load
   };
 })();
 

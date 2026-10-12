@@ -1,0 +1,1929 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>CryptoTracker.Pro — Dashboard de Criptomonedas en Tiempo Real</title>
+  <link rel="stylesheet" href="css/styles.css?v=8.5">
+  <link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="64x64" href="img/favicon-64.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="img/favicon-192.png">
+  <script>
+    (function() {
+      var ua = navigator.userAgent || '';
+      var isIOS = /iPad|iPhone|iPod/.test(ua) ||
+                  (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) ||
+                  (window.Capacitor && window.Capacitor.getPlatform && window.Capacitor.getPlatform() === 'ios') ||
+                  (typeof window.webkit !== 'undefined' && window.webkit.messageHandlers);
+      if (isIOS) {
+        document.documentElement.classList.add('is-ios');
+        document.addEventListener('DOMContentLoaded', function() {
+          if (document.body) {
+            document.body.classList.add('is-ios-device');
+          }
+          var header = document.querySelector('.app-header');
+          if (header) {
+            header.addEventListener('touchmove', function(e) {
+              if (e.target.closest('button') || e.target.closest('.nav-hamburger') || e.target.closest('.header-right-actions')) {
+                return;
+              }
+              e.preventDefault();
+            }, { passive: false });
+          }
+        });
+      }
+    })();
+  </script>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <!-- Hamburger menu toggle (Visible on mobile/tablet on the left) -->
+      <button class="nav-hamburger" id="nav-hamburger" aria-label="Abrir menú de navegación" type="button">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <!-- Logo -->
+      <div class="logo">
+        <img src="img/logo-icon.png" class="logo-img" alt="CryptoTracker.Pro" width="32" height="32">
+        <div>
+          <span class="logo-main-name">CryptoTracker.Pro</span>
+          <span class="logo-subtitle app-user-tier-subtitle" id="header-logo-subtitle">Dashboard Gratuito</span>
+        </div>
+      </div>
+
+      <!-- Desktop Navigation Tabs (Visible on screens > 960px) -->
+      <nav class="desktop-nav-tabs">
+        <button class="tab-btn active" data-tab="top50" data-i18n="tab_top50">📊 Top 50</button>
+        <button class="tab-btn" data-tab="gainers" data-i18n="tab_gainers">🔥 Ganadores</button>
+        <button class="tab-btn" data-tab="favorites"><span data-i18n="tab_favorites">⭐ Favoritos</span> <span id="favorites-count" class="tab-count">0</span></button>
+        <button class="tab-btn" data-tab="portfolio" data-i18n="tab_portfolio">💼 Portfolio</button>
+        <button class="tab-btn" data-tab="achievements" data-i18n="tab_achievements">🏆 Logros</button>
+        <button class="tab-btn" data-tab="glossary" data-i18n="tab_glossary">📖 Vocabulario Cripto</button>
+        <button class="tab-btn tab-btn-premium" data-tab="premium" data-i18n="tab_premium">💎 Análisis Premium</button>
+        <button class="tab-btn" data-tab="about" data-i18n="tab_about">💳 Planes y Suscripción</button>
+
+        <!-- Pestaña de Idioma / Language Tab (1. English, 2. Español) -->
+        <div class="lang-tab-container" id="lang-tab-container">
+          <button class="tab-btn lang-tab-btn" id="lang-tab-btn" type="button" aria-haspopup="true" aria-expanded="false" title="Language / Idioma">
+            <span class="tab-icon">🌐</span>
+            <span id="lang-tab-current">English</span>
+            <span class="lang-arrow">▾</span>
+          </button>
+          <div class="lang-dropdown-menu" id="lang-dropdown-menu">
+            <button type="button" class="lang-dropdown-item active" data-lang="en">
+              <span class="lang-flag">🇬🇧</span>
+              <span class="lang-item-name">English</span>
+              <span class="lang-check">✓</span>
+            </button>
+            <button type="button" class="lang-dropdown-item" data-lang="es">
+              <span class="lang-flag">🇪🇸</span>
+              <span class="lang-item-name">Español</span>
+              <span class="lang-check"></span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Botón de Cuenta / Account Button (Desktop) -->
+        <button class="tab-btn auth-header-btn" id="auth-header-btn" type="button" aria-haspopup="true">
+          <span class="auth-btn-icon" id="auth-header-icon">👤</span>
+          <span class="auth-btn-text" id="auth-header-text" data-i18n="nav_sign_in">Iniciar Sesión</span>
+        </button>
+      </nav>
+
+      <!-- Mobile & Tablet Header Right Actions -->
+      <div class="header-right-actions">
+        <button class="mobile-auth-btn" id="mobile-auth-btn" type="button" aria-label="Mi Cuenta">
+          <span class="mobile-auth-icon" id="mobile-auth-icon">👤</span>
+        </button>
+        <div id="last-updated" class="last-updated">Updated: --:--:--</div>
+      </div>
+    </header>
+
+    <!-- Mobile Drawer & Backdrop (Independent of header stacking context) -->
+    <div class="nav-backdrop" id="nav-backdrop"></div>
+    <aside class="mobile-drawer" id="mobile-nav-drawer" aria-label="Menú móvil">
+      <div class="mobile-drawer-header">
+        <div class="logo">
+          <img src="img/logo-icon.png" class="logo-img" alt="CryptoTracker.Pro" width="30" height="30">
+          <div>
+            <span style="font-weight:800;font-size:1rem;" class="logo-main-name" data-i18n="logo_title">CryptoTracker.Pro</span>
+            <span class="logo-subtitle app-user-tier-subtitle" id="drawer-logo-subtitle" style="font-size:0.62rem;">Dashboard Gratuito</span>
+          </div>
+        </div>
+        <button class="nav-close-btn" id="nav-close-btn" aria-label="Cerrar menú" type="button">✕</button>
+      </div>
+
+      <div class="mobile-drawer-body">
+        <!-- Selector de Idioma en Menú Móvil -->
+        <div class="drawer-lang-section">
+          <div class="drawer-lang-title">
+            <span>🌐</span> <span data-i18n="drawer_lang_label">Idioma / Language</span>
+          </div>
+          <div class="drawer-lang-toggle-group">
+            <button type="button" class="drawer-lang-btn active" data-lang="en">
+              <span class="lang-flag">🇬🇧</span>
+              <span>English</span>
+              <span class="lang-check">✓</span>
+            </button>
+            <button type="button" class="drawer-lang-btn" data-lang="es">
+              <span class="lang-flag">🇪🇸</span>
+              <span>Español</span>
+              <span class="lang-check"></span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Sección de Cuenta en Menú Móvil -->
+        <div class="drawer-auth-section" id="drawer-auth-section">
+          <button type="button" class="drawer-auth-btn" id="drawer-auth-btn">
+            <span class="drawer-auth-icon" id="drawer-auth-icon">👤</span>
+            <div class="drawer-auth-text-wrap">
+              <span class="drawer-auth-title" id="drawer-auth-title" data-i18n="nav_sign_in">Iniciar Sesión</span>
+              <span class="drawer-auth-sub" id="drawer-auth-sub">Sincronizar Cartera Cloud</span>
+            </div>
+            <span class="drawer-auth-arrow">›</span>
+          </button>
+        </div>
+
+        <button class="tab-btn active" data-tab="top50">
+          <span class="tab-icon">📊</span>
+          <span class="tab-text" data-i18n="drawer_top50">Top 50 Activos</span>
+        </button>
+        <button class="tab-btn" data-tab="gainers">
+          <span class="tab-icon">🔥</span>
+          <span class="tab-text" data-i18n="drawer_gainers">Mayores Ganadores</span>
+        </button>
+        <button class="tab-btn" data-tab="favorites">
+          <span class="tab-icon">⭐</span>
+          <span class="tab-text" data-i18n="drawer_favorites">Mis Favoritos</span>
+          <span class="tab-count" style="margin-left:auto;">0</span>
+        </button>
+        <button class="tab-btn" data-tab="portfolio">
+          <span class="tab-icon">💼</span>
+          <span class="tab-text" data-i18n="drawer_portfolio">Simulador Portfolio</span>
+        </button>
+        <button class="tab-btn" data-tab="achievements">
+          <span class="tab-icon">🏆</span>
+          <span class="tab-text" data-i18n="drawer_achievements">Logros y Medallas</span>
+          <span class="tab-count achievements-badge-count" style="margin-left:auto;background:rgba(251,191,36,0.2);color:#fbbf24;border:1px solid rgba(251,191,36,0.3);">0/11</span>
+        </button>
+        <button class="tab-btn" data-tab="glossary">
+          <span class="tab-icon">📖</span>
+          <span class="tab-text" data-i18n="drawer_glossary">Vocabulario Cripto</span>
+        </button>
+        <button class="tab-btn tab-btn-premium" data-tab="premium">
+          <span class="tab-icon">💎</span>
+          <span class="tab-text" data-i18n="drawer_premium">Análisis Premium</span>
+          <span class="badge-pro" style="margin-left:auto;font-size:0.62rem;padding:2px 6px;">VIP</span>
+        </button>
+        <button class="tab-btn" data-tab="about">
+          <span class="tab-icon">💳</span>
+          <span class="tab-text" data-i18n="drawer_about">Planes y Suscripción</span>
+        </button>
+      </div>
+
+      <div class="mobile-drawer-footer">
+        <button type="button" class="btn btn-stripe-open-modal btn-open-checkout-modal" style="width:100%;font-size:0.85rem;padding:10px 12px;gap:6px;" data-i18n="drawer_unlock_btn">
+          🧪 Desbloquear Acceso PRO (Simulación Stripe)
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="search-bar">
+        <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M15.5 14H14.71L14.43 13.73C15.41 12.59 16 11.11 16 9.5C16 5.91 13.09 3 9.5 3C5.91 3 3 5.91 3 9.5C3 13.09 5.91 16 9.5 16C11.11 16 12.59 15.41 13.73 14.43L14 14.71V15.5L19 20.49L20.49 19L15.5 14ZM9.5 14C7.01 14 5 11.99 5 9.5C5 7.01 7.01 5 9.5 5C11.99 5 14 7.01 14 9.5C14 11.99 11.99 14 9.5 14Z" fill="currentColor"/>
+        </svg>
+        <input type="text" id="search-input" placeholder="Buscar criptomonedas..." data-i18n-ph="search_placeholder">
+      </div>
+
+      <!-- Tab Panels -->
+      <div id="panel-top50" class="tab-panel active">
+        <div class="crypto-list-header">
+          <span class="list-col-label" data-i18n="col_rank">#</span>
+          <span class="list-col-label" data-i18n="col_asset">Activo</span>
+          <span class="list-col-label" data-i18n="col_price">Precio</span>
+          <span class="list-col-label" data-i18n="col_change_24h">24h %</span>
+          <span class="list-col-label" data-i18n="col_market_cap">Cap. Mercado</span>
+          <span class="list-col-label" data-i18n="col_trend_7d">7 días</span>
+          <span class="list-col-label"></span>
+        </div>
+        <div id="grid-top50" class="crypto-list"></div>
+      </div>
+
+      <div id="panel-gainers" class="tab-panel">
+        <div class="crypto-list-header">
+          <span class="list-col-label" data-i18n="col_rank">Pos.</span>
+          <span class="list-col-label" data-i18n="col_asset">Activo</span>
+          <span class="list-col-label" data-i18n="col_price">Precio</span>
+          <span class="list-col-label" data-i18n="col_change_24h">24h %</span>
+          <span class="list-col-label" data-i18n="col_market_cap">Cap. Mercado</span>
+          <span class="list-col-label" data-i18n="col_trend_7d">7 días</span>
+          <span class="list-col-label"></span>
+        </div>
+        <div id="grid-gainers" class="crypto-list"></div>
+      </div>
+
+      <div id="panel-favorites" class="tab-panel">
+        <div class="crypto-list-header">
+          <span class="list-col-label" data-i18n="col_rank">#</span>
+          <span class="list-col-label" data-i18n="col_asset">Activo</span>
+          <span class="list-col-label" data-i18n="col_price">Precio</span>
+          <span class="list-col-label" data-i18n="col_change_24h">24h %</span>
+          <span class="list-col-label" data-i18n="col_market_cap">Cap. Mercado</span>
+          <span class="list-col-label" data-i18n="col_trend_7d">7 días</span>
+          <span class="list-col-label"></span>
+        </div>
+        <div id="grid-favorites" class="crypto-list"></div>
+        <div id="favorites-empty" class="empty-state hidden">
+          <div class="empty-icon">⭐</div>
+          <h3 data-i18n="no_favorites_title">Sin favoritos</h3>
+          <p data-i18n="no_favorites_desc">Marca criptomonedas con la estrella para verlas aquí</p>
+        </div>
+      </div>
+
+      <div id="panel-portfolio" class="tab-panel">
+        <div id="portfolio-hero" class="portfolio-hero">
+          <div class="portfolio-total">
+            <span class="label" data-i18n="stat_total_value">Valor Total del Portafolio</span>
+            <div id="portfolio-total-value" class="portfolio-total-value">$0.00</div>
+          </div>
+          <div class="portfolio-stats">
+            <div class="portfolio-stat-item">
+              <span class="label" data-i18n="stat_cash_balance">Balance Disponible</span>
+              <div id="portfolio-balance">$0.00</div>
+            </div>
+            <div class="portfolio-stat-item">
+              <span class="label" data-i18n="stat_crypto_value">Valor en Activos</span>
+              <div id="portfolio-value">$0.00</div>
+            </div>
+            <div class="portfolio-stat-item">
+              <span class="label" data-i18n="stat_unrealized_pnl">P&L Global</span>
+              <div id="portfolio-pnl">$0.00 (0.00%)</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="portfolio-layout">
+          <div class="portfolio-left">
+            <form class="buy-form" id="buy-form" onsubmit="return false;">
+              <h3 class="form-title" data-i18n="buy_title">Comprar Criptomoneda</h3>
+              
+              <div class="form-group">
+                <label data-i18n="buy_search_label">Buscar Cripto</label>
+                <div class="search-autocomplete">
+                  <input type="text" id="buy-search-input" class="form-control" placeholder="Buscar por nombre o símbolo..." data-i18n-ph="buy_search_placeholder" autocomplete="off">
+                  <div id="buy-search-results" class="autocomplete-results hidden"></div>
+                </div>
+                <div class="quick-coins-chips" id="quick-coins-chips" title="Acceso rápido a monedas populares"></div>
+              </div>
+
+              <div id="selected-coin" class="selected-coin hidden">
+                <!-- Selected coin display dynamically injected -->
+              </div>
+
+              <div class="form-group">
+                <label data-i18n="buy_amount_label">Cantidad en USD</label>
+                <input type="number" id="buy-amount" class="form-control" placeholder="Monto a comprar en USD" data-i18n-ph="buy_amount_placeholder" min="1" step="any">
+                <div id="buy-preview" class="buy-preview hidden"></div>
+              </div>
+
+              <!-- Stop Loss & Take Profit Configuration (Optional) -->
+              <div class="sltp-container">
+                <button type="button" class="btn-sltp-toggle" id="toggle-sltp-btn">
+                  <span class="sltp-toggle-title" data-i18n="sltp_toggle">🛡️ Configurar Stop Loss & Take Profit (Opcional)</span>
+                  <span class="sltp-chevron" id="sltp-chevron">▼</span>
+                </button>
+                <div class="sltp-inputs-panel hidden" id="sltp-inputs-panel">
+                  <div class="sltp-inputs-grid">
+                    <!-- Stop Loss Group -->
+                    <div class="sltp-box sl-box">
+                      <div class="sltp-box-header">
+                        <label for="buy-sl" data-i18n="sltp_label_sl">🛡️ Stop Loss ($)</label>
+                        <span class="sltp-calc-badge" id="sl-calc-badge">—</span>
+                      </div>
+                      <input type="number" id="buy-sl" class="form-control" placeholder="Límite de pérdida en $" data-i18n-ph="sltp_ph_sl" step="any" min="0">
+                      <div class="sltp-chips-row">
+                        <button type="button" class="sltp-chip sl-chip buy-sl-chip" data-pct="-3">-3%</button>
+                        <button type="button" class="sltp-chip sl-chip buy-sl-chip" data-pct="-5">-5%</button>
+                        <button type="button" class="sltp-chip sl-chip buy-sl-chip" data-pct="-10">-10%</button>
+                        <button type="button" class="sltp-chip sl-chip buy-sl-chip" data-pct="-15">-15%</button>
+                      </div>
+                    </div>
+
+                    <!-- Take Profit Group -->
+                    <div class="sltp-box tp-box">
+                      <div class="sltp-box-header">
+                        <label for="buy-tp" data-i18n="sltp_label_tp">🎯 Take Profit ($)</label>
+                        <span class="sltp-calc-badge" id="tp-calc-badge">—</span>
+                      </div>
+                      <input type="number" id="buy-tp" class="form-control" placeholder="Objetivo ganancia en $" data-i18n-ph="sltp_ph_tp" step="any" min="0">
+                      <div class="sltp-chips-row">
+                        <button type="button" class="sltp-chip tp-chip buy-tp-chip" data-pct="5">+5%</button>
+                        <button type="button" class="sltp-chip tp-chip buy-tp-chip" data-pct="10">+10%</button>
+                        <button type="button" class="sltp-chip tp-chip buy-tp-chip" data-pct="20">+20%</button>
+                        <button type="button" class="sltp-chip tp-chip buy-tp-chip" data-pct="50">+50%</button>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="sltp-note">
+                    ⚡ <em>Si el precio de mercado alcanza estos niveles, la orden se ejecutará y venderá automáticamente.</em>
+                  </div>
+                </div>
+              </div>
+
+              <button id="buy-btn" class="btn btn-primary btn-buy" type="button" data-i18n="btn_buy_execute">🛒 Comprar Criptomoneda</button>
+            </form>
+          </div>
+
+          <div class="portfolio-right">
+            <div class="holdings-section">
+              <h3 class="section-title" data-i18n="holdings_title">Mis Posiciones</h3>
+              <div id="portfolio-holdings" class="holdings-list"></div>
+            </div>
+
+            <div class="history-section">
+              <button id="history-toggle" class="history-toggle">
+                <span data-i18n="history_title">📋 Historial de Transacciones</span>
+                <svg class="chevron" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+              <div id="portfolio-history" class="history-list hidden"></div>
+            </div>
+
+            <button id="portfolio-reset" class="btn btn-danger btn-reset" style="margin-top: var(--spacing-lg);" data-i18n="btn_reset_portfolio">🔄 Reiniciar $10,000 USD</button>
+          </div>
+        </div>
+
+        <!-- ==================== PREMIUM PORTFOLIO ANALYTICS SECTION ==================== -->
+        <div class="portfolio-premium-section" id="portfolio-premium-section">
+          <div class="portfolio-premium-header">
+            <div class="premium-badge-gold" style="background:rgba(251,191,36,0.15);color:#fbbf24;border-color:rgba(251,191,36,0.3);" data-i18n="port_prem_badge">ANÁLISIS INSTITUCIONAL & QUANT VIP</div>
+            <h2 class="portfolio-premium-title" data-i18n="port_prem_title">
+              📊 Análisis Exhaustivo & Gráficos Cuantitativos de Cartera
+            </h2>
+            <p class="portfolio-premium-subtitle" data-i18n="port_prem_subtitle">
+              Auditoría en tiempo real sobre tu diversificación, curva histórica de capital, ratio Sharpe y diagnóstico táctico inteligente de posiciones.
+            </p>
+          </div>
+
+          <!-- LOCKED / PREVIEW GATEWAY (Shown if user does not have PRO unlocked) -->
+          <div id="portfolio-premium-locked-gate" class="portfolio-premium-gate hidden">
+            <div class="premium-gate-card">
+              <div class="lock-glow-icon">🔒</div>
+              <h3 data-i18n="port_gate_title">Desbloquea los Gráficos Avanzados de tu Cartera</h3>
+              <p data-i18n="port_gate_desc">
+                Accede a la curva de crecimiento del capital (Equity Curve), gráfico Donut de asignación de activos, matriz de riesgo Sharpe y recomendaciones tácticas automáticas.
+              </p>
+              <div class="premium-gate-actions">
+                <button type="button" class="btn btn-primary btn-open-checkout-modal" data-i18n="port_gate_btn_unlock">
+                  🧪 Activar Acceso PRO Gratis (Simulación Stripe)
+                </button>
+                <button type="button" class="btn btn-secondary btn-activate-demo" data-i18n="port_gate_btn_demo">
+                  ⚡ Probar Demo 7 Días
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- UNLOCKED / DASHBOARD CONTENT -->
+          <div id="portfolio-premium-content" class="portfolio-premium-dashboard">
+            <!-- Health Score & Quantitative KPIs -->
+            <div class="port-health-row">
+              <div class="port-health-card">
+                <div class="port-health-header">
+                  <span class="port-health-label" data-i18n="port_health_score_label">Score de Salud de Cartera</span>
+                  <span class="port-health-badge" id="port-health-badge">A+ Excelente</span>
+                </div>
+                <div class="port-health-main">
+                  <div class="port-health-meter">
+                    <svg viewBox="0 0 100 55" class="gauge-svg">
+                      <path d="M 12 50 A 38 38 0 0 1 88 50" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="8" stroke-linecap="round"/>
+                      <path id="gauge-meter-fill" d="M 12 50 A 38 38 0 0 1 88 50" fill="none" stroke="url(#gauge-grad)" stroke-width="8" stroke-linecap="round" stroke-dasharray="119.4" stroke-dashoffset="20"/>
+                      <defs>
+                        <linearGradient id="gauge-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                          <stop offset="0%" stop-color="#ef4444"/>
+                          <stop offset="50%" stop-color="#f59e0b"/>
+                          <stop offset="100%" stop-color="#10b981"/>
+                        </linearGradient>
+                      </defs>
+                    </svg>
+                    <div class="port-health-number" id="port-health-score">85</div>
+                  </div>
+                  <div class="port-health-summary">
+                    <h4 id="port-health-title">Estructura Óptima</h4>
+                    <p id="port-health-desc">Tu cartera presenta un equilibrio saludable entre liquidez y diversificación.</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 4 Institutional Quant KPIs -->
+              <div class="port-kpis-grid">
+                <div class="port-kpi-item">
+                  <div class="port-kpi-label" data-i18n="port_kpi_sharpe">Ratio Sharpe Est.</div>
+                  <div class="port-kpi-val" id="port-kpi-sharpe-val">1.84</div>
+                  <div class="port-kpi-hint" data-i18n="port_kpi_sharpe_hint">Retorno ajustado al riesgo</div>
+                </div>
+                <div class="port-kpi-item">
+                  <div class="port-kpi-label" data-i18n="port_kpi_maxdd">Max Drawdown</div>
+                  <div class="port-kpi-val text-warning" id="port-kpi-maxdd-val">-0.0%</div>
+                  <div class="port-kpi-hint" data-i18n="port_kpi_maxdd_hint">Retroceso máx. registrado</div>
+                </div>
+                <div class="port-kpi-item">
+                  <div class="port-kpi-label" data-i18n="port_kpi_winrate">Tasa de Acierto (Win Rate)</div>
+                  <div class="port-kpi-val text-success" id="port-kpi-winrate-val">100%</div>
+                  <div class="port-kpi-hint" id="port-kpi-winrate-sub">0 ganadas / 0 perdidas</div>
+                </div>
+                <div class="port-kpi-item">
+                  <div class="port-kpi-label" data-i18n="port_kpi_diversification">Índice Diversificación</div>
+                  <div class="port-kpi-val text-info" id="port-kpi-div-val">82/100</div>
+                  <div class="port-kpi-hint" data-i18n="port_kpi_div_hint">Riesgo no concentrado</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Charts Grid: Donut Allocation & Equity Growth Curve -->
+            <div class="port-charts-grid">
+              <!-- Chart 1: Donut Allocation -->
+              <div class="port-chart-card">
+                <div class="port-chart-header">
+                  <div class="port-chart-title-wrap">
+                    <span class="chart-icon">🍩</span>
+                    <h3 data-i18n="chart_allocation_title">Distribución de Activos (Asset Allocation)</h3>
+                  </div>
+                  <span class="port-chart-pill" id="port-active-assets-pill">1 activo</span>
+                </div>
+                <div class="port-donut-wrap">
+                  <div class="donut-svg-container">
+                    <svg viewBox="0 0 200 200" id="port-donut-svg" class="port-donut-svg"></svg>
+                    <div class="donut-center-label">
+                      <span class="donut-center-sub" data-i18n="chart_donut_total">Total</span>
+                      <span class="donut-center-val" id="port-donut-total-val">$10,000</span>
+                    </div>
+                  </div>
+                  <div class="port-donut-legend" id="port-donut-legend">
+                    <!-- Injected dynamically -->
+                  </div>
+                </div>
+              </div>
+
+              <!-- Chart 2: Equity Curve -->
+              <div class="port-chart-card">
+                <div class="port-chart-header">
+                  <div class="port-chart-title-wrap">
+                    <span class="chart-icon">📈</span>
+                    <h3 data-i18n="chart_equity_title">Curva Histórica de Capital (Equity Curve)</h3>
+                  </div>
+                  <div class="port-equity-pnl-pill" id="port-equity-pnl-badge">+$0.00 (+0.0%)</div>
+                </div>
+                <div class="port-equity-canvas-wrap">
+                  <canvas id="port-equity-canvas" width="600" height="260" class="port-equity-canvas"></canvas>
+                </div>
+                <div class="equity-chart-footer">
+                  <div class="equity-legend-item">
+                    <span class="dot dot-green"></span>
+                    <span data-i18n="legend_equity_curve">Valor de Cartera</span>
+                  </div>
+                  <div class="equity-legend-item">
+                    <span class="dot dot-dashed"></span>
+                    <span data-i18n="legend_baseline">Base Inicial ($10,000 USD)</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Chart 3: P&L by Asset Comparison Bar Chart -->
+            <div class="port-chart-card port-bars-card">
+              <div class="port-chart-header">
+                <div class="port-chart-title-wrap">
+                  <span class="chart-icon">📊</span>
+                  <h3 data-i18n="chart_pnl_bars_title">Rendimiento Comparativo por Criptoactivo (P&L %)</h3>
+                </div>
+                <span class="port-chart-pill" data-i18n="chart_pnl_bars_subtitle">Posiciones Abiertas & Cerradas</span>
+              </div>
+              <div class="port-bars-list" id="port-bars-list">
+                <!-- Injected dynamically -->
+              </div>
+            </div>
+
+            <!-- Live Connectivity Header Bar -->
+            <div class="port-connectivity-bar">
+              <div class="port-conn-status">
+                <span class="port-conn-dot"></span>
+                <span class="port-conn-label" data-i18n="port_conn_status">Conectado a Redes de Análisis en Tiempo Real:</span>
+                <span class="port-conn-sources">CoinGecko API (v3) · TradingView Live · Binance Spot · Alternative.me Sentimiento</span>
+              </div>
+              <div class="port-conn-time" id="port-conn-time">
+                Sincronización en vivo activa
+              </div>
+            </div>
+
+            <!-- Exhaustive Per-Asset Technical & Market Analysis Section -->
+            <div class="port-asset-deep-dive-card">
+              <div class="port-insights-header">
+                <div class="port-insights-title">
+                  <span>🔬</span>
+                  <h3 data-i18n="port_deep_dive_title">Análisis Técnico Exhaustivo de tus Criptoactivos en Cartera</h3>
+                </div>
+                <button type="button" class="btn btn-secondary btn-sm" id="btn-refresh-port-insights" data-i18n="port_btn_reanalyze_live">
+                  🔄 Reanalizar Cartera en Vivo
+                </button>
+              </div>
+              <p class="port-deep-dive-subtitle" data-i18n="port_deep_dive_subtitle">
+                Diagnóstico cuantitativo detallado para cada una de tus posiciones abiertas, conectando indicadores técnicos en tiempo real (RSI, EMAs, Soportes/Resistencias) y enlaces directos a plataformas profesionales de análisis.
+              </p>
+              
+              <!-- Container for per-asset cards -->
+              <div class="port-assets-analysis-list" id="port-assets-analysis-list">
+                <!-- Dynamically populated per held asset -->
+              </div>
+            </div>
+
+            <!-- Intelligent AI Portfolio Advisor & Actionable Insights -->
+            <div class="port-insights-card">
+              <div class="port-insights-header">
+                <div class="port-insights-title">
+                  <span>🧠</span>
+                  <h3 data-i18n="port_insights_title">Diagnóstico Táctico Global & Recomendaciones del Asesor</h3>
+                </div>
+              </div>
+              <div class="port-insights-list" id="port-insights-list">
+                <!-- Dynamically generated suggestions based on actual holdings -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab Panel: Logros y Medallas (Gamificación) -->
+      <div id="panel-achievements" class="tab-panel">
+        <div class="developer-container achievements-container">
+          <!-- Header Center -->
+          <div class="pricing-header-center">
+            <div class="premium-badge-gold" style="background:rgba(251,191,36,0.15);color:#fbbf24;border-color:rgba(251,191,36,0.3);" data-i18n="ach_badge_pill">GAMIFICACIÓN & DISCIPLINA TRADING</div>
+            <h1 class="pricing-title" data-i18n="ach_title">🏆 Vitrina de Trofeos & Medallas</h1>
+            <p class="pricing-subtitle" data-i18n="ach_subtitle">
+              Recompensa y refuerza los hábitos profesionales de inversión: gestión de riesgo, diversificación, análisis técnico y disciplina psicológica.
+            </p>
+
+            <!-- Hero Stats & Rank Card -->
+            <div class="ach-hero-stats-card">
+              <div class="ach-stats-left">
+                <div class="ach-stats-metric">
+                  <span class="ach-metric-label" data-i18n="ach_stats_unlocked">Desbloqueados</span>
+                  <div class="ach-metric-value-wrap">
+                    <span class="ach-metric-val" id="ach-stats-count">0 / 11</span>
+                    <span class="ach-metric-pct" id="ach-stats-pct">0%</span>
+                  </div>
+                </div>
+                <div class="ach-hero-progress-track">
+                  <div class="ach-hero-progress-fill" id="ach-stats-progress-fill" style="width: 0%;"></div>
+                </div>
+              </div>
+
+              <div class="ach-stats-right">
+                <span class="ach-rank-tag-label" data-i18n="ach_rank_label">Rango de Trader</span>
+                <div class="ach-rank-badge" id="ach-user-rank">Novato Disciplinado 🌱</div>
+              </div>
+            </div>
+
+            <!-- Category Filter Chips -->
+            <div class="ach-filter-chips-row">
+              <button type="button" class="ach-filter-chip active" data-category="all" data-i18n="ach_filter_all">✨ Todas las Medallas</button>
+              <button type="button" class="ach-filter-chip" data-category="risk_psychology" data-i18n="ach_filter_risk">🛑 Riesgo y Psicología</button>
+              <button type="button" class="ach-filter-chip" data-category="portfolio_strategy" data-i18n="ach_filter_strategy">💼 Cartera y Estrategia</button>
+              <button type="button" class="ach-filter-chip" data-category="technical_progression" data-i18n="ach_filter_tech">🕯️ Análisis Técnico</button>
+            </div>
+          </div>
+
+          <!-- Trophy Showcase Grid -->
+          <div class="achievements-grid" id="achievements-grid">
+            <!-- Dynamically populated by window.Achievements.renderShowcase() -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab Panel: Premium Market Analysis (Locked by default) -->
+      <div id="panel-premium" class="tab-panel">
+        <div class="premium-container">
+          
+          <!-- LOCKED VIEW (Default) -->
+          <div id="premium-locked-view" class="premium-locked-card">
+            <div class="lock-glow-icon">🔒</div>
+            <div class="premium-badge-gold" data-i18n="premium_banner_badge">EXCLUSIVO MIEMBROS VIP</div>
+            <h1 class="premium-lock-title" data-i18n="premium_title">Zona de Análisis Cuantitativo & Señales de Mercado</h1>
+            <p class="premium-lock-subtitle" data-i18n="premium_subtitle">
+              Esta sección está restringida exclusivamente a usuarios Premium. Contiene algoritmos de análisis técnico en vivo, señales de trading, índice Fear & Greed en tiempo real y niveles de soporte/resistencia calculados para los principales activos.
+            </p>
+
+            <div class="premium-features-locked-grid">
+              <div class="prem-feature-box">
+                <span class="prem-icon">🎯</span>
+                <h4 data-i18n="feat_signals_title">Señales Algorítmicas</h4>
+                <p data-i18n="feat_signals_desc">Indicadores RSI, Cruces de Medias Móviles (SMA 20/50/200) y detección de momentum.</p>
+              </div>
+              <div class="prem-feature-box">
+                <span class="prem-icon">🌡️</span>
+                <h4 data-i18n="feat_fg_title">Fear & Greed Index en Vivo</h4>
+                <p data-i18n="feat_fg_desc">Medidor cuantitativo de sentimiento del mercado y psicología de masas.</p>
+              </div>
+              <div class="prem-feature-box">
+                <span class="prem-icon">🛡️</span>
+                <h4 data-i18n="feat_sr_title">Soportes & Resistencias</h4>
+                <p data-i18n="feat_sr_desc">Niveles clave de entrada y salida calculados matemáticamente para BTC, ETH, SOL y más.</p>
+              </div>
+              <div class="prem-feature-box">
+                <span class="prem-icon">📊</span>
+                <h4 data-i18n="feat_dom_title">Dominancia & Liquidez</h4>
+                <p data-i18n="feat_dom_desc">Análisis de rotación de capital institucional entre Bitcoin y el mercado de Altcoins.</p>
+              </div>
+            </div>
+
+            <!-- Trial Expired Notice / Status Container -->
+            <div id="trial-status-container"></div>
+
+            <!-- Unlock Form -->
+            <div class="premium-unlock-box">
+              <h3 class="unlock-title" data-i18n="unlock_box_title">🔑 Desbloquear Acceso a la Zona Premium</h3>
+              <p class="unlock-desc" data-i18n="unlock_box_desc">
+                Accede a algoritmos cuantitativos en tiempo real, señales técnicas avanzadas y niveles clave de mercado. Desbloquea tu acceso mediante la <strong>simulación interactiva de Stripe (Entorno de Pruebas)</strong> o activa tu prueba gratuita de 7 días.
+              </p>
+              
+              <div class="unlock-input-group">
+                <input type="password" id="premium-key-input" class="form-control" placeholder="Introduce tu clave de licencia..." data-i18n-ph="unlock_ph_key" autocomplete="off">
+                <button type="button" id="premium-unlock-btn" class="btn btn-primary btn-unlock" data-i18n="unlock_btn">🔓 Desbloquear</button>
+              </div>
+              <div id="unlock-error" class="unlock-error hidden" data-i18n="unlock_error">Clave no válida. Prueba la simulación interactiva con Stripe.</div>
+
+              <div class="unlock-actions-row">
+                <button type="button" class="btn-stripe-open-modal btn-open-checkout-modal" data-plan="annual" data-i18n="unlock_btn_stripe">
+                  🧪 Simular Suscripción con Stripe
+                </button>
+                <button type="button" id="premium-demo-btn" class="btn-demo-start" data-i18n="unlock_btn_trial">
+                  ✨ Iniciar Prueba Demo (7 Días)
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- UNLOCKED VIEW (Visible when authenticated or in active trial) -->
+          <div id="premium-unlocked-view" class="premium-unlocked-content hidden">
+            <!-- Premium Header -->
+            <div class="premium-active-header">
+              <div class="premium-status-badge" id="premium-status-badge">
+                <span>👑</span> <span data-i18n="badge_pro_active">MEMBRESÍA PREMIUM ACTIVA</span>
+              </div>
+              <button type="button" id="premium-lock-again-btn" class="btn-lock-session" title="Cerrar sesión de análisis premium" data-i18n="btn_lock_session">
+                🔒 Bloquear de nuevo
+              </button>
+            </div>
+
+            <!-- Sentiment & Market Health Grid -->
+            <div class="premium-analytics-grid">
+              <!-- Fear & Greed Card -->
+              <div class="premium-card fear-greed-card">
+                <div class="card-header-flex">
+                  <h3 data-i18n="fear_greed_card_title">🌡️ Fear & Greed Index</h3>
+                  <span class="badge-live" data-i18n="badge_live">EN VIVO</span>
+                </div>
+                <div class="gauge-container">
+                  <div class="gauge-value-big" id="fg-value">68</div>
+                  <div class="gauge-label-state" id="fg-label" style="color: #22c55e;">CODICIA MODERADA (Greed)</div>
+                </div>
+                <div class="meter-bar-wrapper">
+                  <div class="meter-bar-fill" style="width: 68%;"></div>
+                </div>
+                <div class="meter-scales">
+                  <span data-i18n="fg_scale_0">0 Miedo Extremo</span>
+                  <span data-i18n="fg_scale_50">50 Neutral</span>
+                  <span data-i18n="fg_scale_100">100 Codicia Extrema</span>
+                </div>
+                <p class="card-footer-note" data-i18n="fg_footer_note">
+                  El sentimiento actual favorece la continuación de la tendencia alcista con baja presión de venta en exchanges.
+                </p>
+              </div>
+
+              <!-- Market Dominance Card -->
+              <div class="premium-card dominance-card">
+                <div class="card-header-flex">
+                  <h3 data-i18n="dom_card_title">📊 Dominancia & Flujo Institucional</h3>
+                  <span class="badge-live" data-i18n="badge_updated">ACTUALIZADO</span>
+                </div>
+                <div class="dominance-stats-list">
+                  <div class="dom-stat-row">
+                    <span class="dom-name">Bitcoin (BTC.D)</span>
+                    <span class="dom-pct" style="color: #f59e0b;">56.8%</span>
+                  </div>
+                  <div class="meter-bar-wrapper mini"><div class="meter-bar-fill gold" style="width: 56.8%;"></div></div>
+
+                  <div class="dom-stat-row" style="margin-top: 10px;">
+                    <span class="dom-name">Ethereum (ETH.D)</span>
+                    <span class="dom-pct" style="color: #6366f1;">15.4%</span>
+                  </div>
+                  <div class="meter-bar-wrapper mini"><div class="meter-bar-fill indigo" style="width: 15.4%;"></div></div>
+
+                  <div class="dom-stat-row" style="margin-top: 10px;">
+                    <span class="dom-name" data-i18n="dom_altcoins">Altcoins & Stablecoins</span>
+                    <span class="dom-pct" style="color: #10b981;">27.8%</span>
+                  </div>
+                  <div class="meter-bar-wrapper mini"><div class="meter-bar-fill green" style="width: 27.8%;"></div></div>
+                </div>
+                <p class="card-footer-note" data-i18n="dom_footer_note">
+                  Fase de consolidación en Bitcoin. Las altcoins de gran capitalización muestran entradas de liquidez sostenida.
+                </p>
+              </div>
+            </div>
+
+            <!-- Technical Signals Table -->
+            <div class="premium-card signals-card" style="margin-top: var(--spacing-xl);">
+              <div class="card-header-flex">
+                <div>
+                  <h3 style="font-size: 1.25rem;" data-i18n="signals_card_title">🎯 Señales Cuantitativas & Niveles Clave (Top Activos)</h3>
+                  <p style="font-size: 0.82rem; color: var(--text-secondary); margin-top: 2px;" data-i18n="signals_card_subtitle">Cálculo algorítmico basado en RSI (14), Medias Móviles Exponenciales y Volatilidad ATR.</p>
+                </div>
+                <span class="badge-pro" data-i18n="badge_pro_signals">PRO SIGNALS</span>
+              </div>
+
+              <div class="signals-table-wrapper">
+                <table class="signals-table">
+                  <thead>
+                    <tr>
+                      <th data-i18n="col_asset">Activo</th>
+                      <th data-i18n="col_price_curr">Precio Actual</th>
+                      <th data-i18n="col_rsi">RSI (14)</th>
+                      <th data-i18n="col_trend_emas">Tendencia (EMAs)</th>
+                      <th data-i18n="col_support">Soporte Clave</th>
+                      <th data-i18n="col_resistance">Resistencia Clave</th>
+                      <th data-i18n="col_verdict">Veredicto Algorítmico</th>
+                    </tr>
+                  </thead>
+                  <tbody id="signals-table-body">
+                    <!-- Populated dynamically via JS with real market data -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Breakout & Market Opportunities Radar -->
+            <div class="premium-card opportunities-card" style="margin-top: var(--spacing-xl);">
+              <div class="card-header-flex">
+                <h3 data-i18n="opp_radar_title">🚨 Radar de Oportunidades & Patrones Detectados Hoy</h3>
+                <span class="badge-live" data-i18n="badge_today">HOY</span>
+              </div>
+              <div class="opportunities-grid" id="opportunities-grid">
+                <!-- Generated dynamically -->
+              </div>
+            </div>
+
+            <!-- Executive Macro Report -->
+            <div class="premium-card macro-report-card" style="margin-top: var(--spacing-xl);">
+              <div class="card-header-flex">
+                <h3 data-i18n="macro_report_title">📑 Informe Ejecutivo Diario del Mercado</h3>
+                <span class="badge-pro">ANALYSIS v3</span>
+              </div>
+              <div class="macro-content">
+                <p data-i18n-html="macro_summary">
+                  <strong>Resumen de Mercado:</strong> Los activos de primera línea mantienen una estructura técnica constructiva. La absorción de órdenes de venta en la zona de soporte institucional de Bitcoin sugiere acumulación por parte de grandes tenedores.
+                </p>
+                <div class="key-takeaways">
+                  <div class="takeaway-item">
+                    <span class="takeaway-bullet">✅</span>
+                    <span data-i18n-html="macro_takeaway_1"><strong>Nivel de invalidación alcista:</strong> Mantener cierres diarios por encima de soporte clave.</span>
+                  </div>
+                  <div class="takeaway-item">
+                    <span class="takeaway-bullet">⚠️</span>
+                    <span data-i18n-html="macro_takeaway_2"><strong>Zona de toma de beneficios:</strong> Próxima zona de resistencia técnica para rebalanceo de posiciones.</span>
+                  </div>
+                  <div class="takeaway-item">
+                    <span class="takeaway-bullet">📈</span>
+                    <span data-i18n-html="macro_takeaway_3"><strong>Ratio Riesgo/Beneficio:</strong> Favorable para estrategias de acumulación progresiva (DCA).</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ── Institutional Daily Report ── -->
+            <div class="premium-card report-card" style="margin-top: var(--spacing-xl);">
+              <div class="card-header-flex">
+                <div>
+                  <h3 style="font-size: 1.25rem;" data-i18n="report_card_title">📊 Informe Diario Institucional</h3>
+                  <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 3px;" data-i18n="report_card_desc">
+                    Análisis cuantitativo generado automáticamente con datos de mercado en tiempo real
+                  </p>
+                </div>
+                <div style="display:flex; gap: 8px; align-items: center; flex-shrink:0;">
+                  <span class="badge-live">AUTO-GEN</span>
+                  <button type="button" id="generate-report-btn" class="btn btn-generate-report" data-i18n="btn_generate_report">
+                    ⚡ Generar Informe
+                  </button>
+                </div>
+              </div>
+
+              <!-- Report output area -->
+              <div id="report-output" class="report-output">
+                <div class="report-placeholder">
+                  <div class="report-placeholder-icon">📋</div>
+                  <p data-i18n-html="report_placeholder_p1">Haz clic en <strong>⚡ Generar Informe</strong> para producir el análisis institucional del mercado con los datos en tiempo real cargados en la plataforma.</p>
+                  <p style="font-size: 0.78rem; margin-top: 6px; color: var(--text-muted);" data-i18n="report_placeholder_p2">El informe se actualiza con cada regeneración usando los precios y métricas más recientes.</p>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Tab Panel: Pricing & Stripe Gateway -->
+      <div id="panel-about" class="tab-panel">
+        <div class="developer-container">
+          <div class="pricing-header-center">
+            <div style="margin-bottom: 12px;">
+              <img src="img/logo-icon.png" alt="CryptoTracker.Pro" style="width: 58px; height: 58px; filter: drop-shadow(0 0 16px rgba(56,189,248,0.5));">
+            </div>
+            <div class="premium-badge-gold" data-i18n="pricing_badge">PLANES & LICENCIAS PRO</div>
+            <h1 class="pricing-title" data-i18n="pricing_title">Potencia tu Trading Cuantitativo</h1>
+            <p class="pricing-subtitle" data-i18n="pricing_subtitle">
+              Elige el plan ideal para acceder a señales algorítmicas en tiempo real, informes institucionales diarios y simulador de trading con Stop Loss & Take Profit automatizado.
+            </p>
+            <div class="stripe-simulation-notice">
+              <span class="sim-badge" data-i18n="sim_notice_badge">🧪 ENTORNO DE PRUEBAS / SIMULACIÓN STRIPE</span>
+              <p data-i18n="sim_notice_text">Estamos en fase piloto: la pasarela Stripe está completamente simulada para que pruebes los planes y actives todas las herramientas PRO al instante, sin cobros reales ni necesidad de cuenta.</p>
+            </div>
+          </div>
+
+          <!-- 3-Tier Pricing Cards Grid -->
+          <div class="pricing-cards-grid">
+            <!-- Tier 1: Mensual -->
+            <div class="pricing-card">
+              <div class="pricing-card-header">
+                <h3 class="plan-name" data-i18n="plan_monthly_name">Plan Pro Mensual</h3>
+                <p class="plan-desc" data-i18n="plan_monthly_desc">Flexibilidad total sin permanencia</p>
+              </div>
+              <div class="plan-price-wrap">
+                <span class="plan-price-currency">$</span>
+                <span class="plan-price-number">9.99</span>
+                <span class="plan-price-period" data-i18n="plan_monthly_period">/mes</span>
+              </div>
+              <ul class="plan-features-list">
+                <li><span class="check-icon">✓</span> <span data-i18n="feat_signals_bullet">Señales cuantitativas en tiempo real (RSI, MA Cross)</span></li>
+                <li><span class="check-icon">✓</span> <span data-i18n="feat_fg_bullet">Índice Fear & Greed en vivo</span></li>
+                <li><span class="check-icon">✓</span> <span data-i18n="feat_sr_bullet">Soportes y resistencias calculadas</span></li>
+                <li><span class="check-icon">✓</span> <span data-i18n="feat_sim_bullet">Simulador con Stop Loss y Take Profit</span></li>
+                <li><span class="check-icon">✓</span> <span data-i18n="feat_charts_bullet">Gráficos interactivos multi-temporalidad</span></li>
+              </ul>
+              <button type="button" class="btn-plan-action secondary btn-open-checkout-modal" data-plan="monthly" data-i18n="btn_monthly">
+                🧪 Simular $9.99 / mes
+              </button>
+            </div>
+
+            <!-- Tier 2: Anual (Featured) -->
+            <div class="pricing-card featured">
+              <span class="popular-badge" data-i18n="plan_annual_badge">⭐ MÁS POPULAR</span>
+              <div class="pricing-card-header">
+                <h3 class="plan-name" style="color: #fbbf24;" data-i18n="plan_annual_name">Plan Pro Anual</h3>
+                <p class="plan-desc" data-i18n="plan_annual_desc">El plan más elegido por traders activos</p>
+              </div>
+              <div class="plan-price-wrap">
+                <span class="plan-price-currency">$</span>
+                <span class="plan-price-number">69.99</span>
+                <span class="plan-price-period" data-i18n="plan_annual_period">/año</span>
+                <div><span class="plan-savings-pill" data-i18n="plan_annual_savings">🔥 Ahorras un 42% ($5.83/mes)</span></div>
+              </div>
+              <ul class="plan-features-list">
+                <li><span class="check-icon">✓</span> <strong data-i18n="feat_all_monthly">Todo lo incluido en el Plan Mensual</strong></li>
+                <li><span class="check-icon">✓</span> <span data-i18n="feat_daily_reports">Generador de Informes Institucionales diarios</span></li>
+                <li><span class="check-icon">✓</span> <span data-i18n="feat_radar">Radar de oportunidades y rupturas de rango</span></li>
+                <li><span class="check-icon">✓</span> <span data-i18n="feat_updates">Actualizaciones automáticas prioritarias</span></li>
+                <li><span class="check-icon">✓</span> <span data-i18n="feat_priority_support">Soporte técnico preferente</span></li>
+              </ul>
+              <button type="button" class="btn-plan-action featured-btn btn-open-checkout-modal" data-plan="annual" data-i18n="btn_annual">
+                🧪 Simular $69.99 / año (Stripe)
+              </button>
+            </div>
+
+            <!-- Tier 3: Vitalicia -->
+            <div class="pricing-card">
+              <div class="pricing-card-header">
+                <h3 class="plan-name" data-i18n="plan_lifetime_name">Licencia Vitalicia VIP</h3>
+                <p class="plan-desc" data-i18n="plan_lifetime_desc">Acceso ilimitado para siempre</p>
+              </div>
+              <div class="plan-price-wrap">
+                <span class="plan-price-currency">$</span>
+                <span class="plan-price-number">149.99</span>
+                <span class="plan-price-period" data-i18n="plan_lifetime_period">pago único</span>
+                <div><span class="plan-savings-pill" style="background:rgba(99,102,241,0.15);color:#a5b4fc;border-color:rgba(99,102,241,0.3);" data-i18n="plan_lifetime_badge">👑 Acceso Permanente</span></div>
+              </div>
+              <ul class="plan-features-list">
+                <li><span class="check-icon">✓</span> <strong data-i18n="feat_lifetime_access">Acceso ilimitado de por vida</strong></li>
+                <li><span class="check-icon">✓</span> <span data-i18n="feat_no_renewals">Sin cuotas mensuales ni renovaciones</span></li>
+                <li><span class="check-icon">✓</span> <span data-i18n="feat_future_updates">Todas las características futuras incluidas</span></li>
+                <li><span class="check-icon">✓</span> <span data-i18n="feat_transferable_key">Clave de licencia VIP personal transferible</span></li>
+                <li><span class="check-icon">✓</span> <span data-i18n="feat_vip_support">Soporte VIP directo</span></li>
+              </ul>
+              <button type="button" class="btn-plan-action primary btn-open-checkout-modal" data-plan="lifetime" data-i18n="btn_lifetime">
+                🧪 Simular Licencia VIP ($149.99)
+              </button>
+            </div>
+          </div>
+
+          <!-- Stripe Trust & Security Box -->
+          <div class="stripe-trust-box">
+            <div class="stripe-trust-left">
+              <span class="stripe-logo-badge">Stripe</span>
+              <div class="stripe-trust-text">
+                <h4 data-i18n="trust_title">🔒 Pasarela de Pago Segura con Encriptación SSL de 256 bits</h4>
+                <p data-i18n="trust_desc">Tus datos viajan cifrados y no se almacenan en nuestros servidores. Pagos procesados por Stripe Payments Europe, Ltd.</p>
+              </div>
+            </div>
+            <div class="stripe-payment-methods">
+              <span class="card-pill">💳 Visa</span>
+              <span class="card-pill">Mastercard</span>
+              <span class="card-pill">AMEX</span>
+              <span class="card-pill">Apple Pay</span>
+              <span class="card-pill">Google Pay</span>
+            </div>
+          </div>
+
+          <!-- Feature Highlights Grid -->
+          <div class="license-features-grid" style="margin-top: var(--spacing-xl);">
+            <div class="license-feature-item">
+              <span class="feature-icon">⚡</span>
+              <h4 data-i18n="highlight_top50_title">Top 50 en Vivo</h4>
+              <p data-i18n="highlight_top50_desc">Monitoreo continuo de los activos con mayor volumen y capitalización.</p>
+            </div>
+            <div class="license-feature-item">
+              <span class="feature-icon">🔥</span>
+              <h4 data-i18n="highlight_gainers_title">Ganadores del Día</h4>
+              <p data-i18n="highlight_gainers_desc">Detección en tiempo real de mayores subidas porcentuales.</p>
+            </div>
+            <div class="license-feature-item">
+              <span class="feature-icon">🛡️</span>
+              <h4 data-i18n="highlight_sltp_title">Stop Loss & Take Profit</h4>
+              <p data-i18n="highlight_sltp_desc">Ejecución automática de órdenes para proteger beneficios y limitar riesgos.</p>
+            </div>
+            <div class="license-feature-item">
+              <span class="feature-icon">📊</span>
+              <h4 data-i18n="highlight_quant_title">Análisis Cuantitativo</h4>
+              <p data-i18n="highlight_quant_desc">Señales algorítmicas, zonas de soporte/resistencia y sentimiento de mercado.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab Panel: Vocabulario Cripto (Glosario Sencillo) -->
+      <div id="panel-glossary" class="tab-panel">
+        <div class="developer-container glossary-container">
+          <div class="pricing-header-center">
+            <div class="premium-badge-gold" style="background:rgba(56,189,248,0.15);color:#38bdf8;border-color:rgba(56,189,248,0.3);" data-i18n="glossary_badge">GUÍA PARA PRINCIPIANTES & EXPERTOS</div>
+            <h1 class="pricing-title" data-i18n="glossary_title">📖 Vocabulario Cripto Sencillo</h1>
+            <p class="pricing-subtitle" data-i18n="glossary_subtitle">
+              Los conceptos y términos más importantes del mundo cripto explicados para personas normales, con ejemplos de la vida real y sin tecnicismos raros.
+            </p>
+
+            <!-- Buscador interactivo y Filtros -->
+            <div class="glossary-search-wrapper">
+              <div class="glossary-search-box">
+                <span class="glossary-search-icon">🔍</span>
+                <input type="text" id="glossary-search-input" placeholder="Buscar término: ej. HODL, Wallet, Gas, Ballena, Bitcoin..." data-i18n-ph="glossary_search_ph" class="glossary-search-input" autocomplete="off">
+                <button type="button" id="glossary-search-clear" class="glossary-search-clear hidden" title="Limpiar búsqueda">✕</button>
+              </div>
+              <div class="glossary-chips-row">
+                <button type="button" class="glossary-chip active" data-category="all"><span data-i18n="glossary_tab_all">✨ Todos</span> (<span id="glossary-count-all">26</span>)</button>
+                <button type="button" class="glossary-chip" data-category="basics" data-i18n="glossary_tab_basics">🧱 Conceptos Básicos</button>
+                <button type="button" class="glossary-chip" data-category="trading" data-i18n="glossary_tab_trading">📈 Mercado & Trading</button>
+                <button type="button" class="glossary-chip" data-category="security" data-i18n="glossary_tab_security">🛡️ Seguridad & Carteras</button>
+                <button type="button" class="glossary-chip" data-category="slang" data-i18n="glossary_tab_slang">💬 Jerga & Slang</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Mensaje sin resultados (oculto por defecto) -->
+          <div id="glossary-empty-state" class="glossary-empty-state hidden">
+            <span style="font-size:2.4rem;">🔎</span>
+            <h3 data-i18n="glossary_empty_title">No encontramos ese término</h3>
+            <p data-i18n="glossary_empty_desc">Prueba con otra palabra o selecciona una categoría arriba.</p>
+          </div>
+
+          <!-- Grid de términos -->
+          <div class="glossary-grid" id="glossary-grid">
+
+            <!-- 1. Blockchain -->
+            <div class="glossary-card" data-term-id="blockchain" data-category="basics" data-keywords="blockchain cadena bloques libro contable decentralizacion red nodos">
+              <div class="glossary-card-header">
+                <span class="glossary-term-icon">⛓️</span>
+                <div class="glossary-term-title-wrap">
+                  <span class="glossary-category-pill pill-basics">Básico</span>
+                  <h3>Blockchain (Cadena de Bloques)</h3>
+                </div>
+              </div>
+              <p class="glossary-def">
+                Es un libro de cuentas digital e incorruptible compartido entre miles de ordenadores en todo el mundo. Cada bloque de transacciones se sella matemáticamente y nadie puede borrarlo ni modificarlo.
+              </p>
+              <div class="glossary-example">
+                <span class="example-icon">💡</span>
+                <div><strong>En la vida real:</strong> Como si cuando le pagas 10€ a un amigo, todos los vecinos del barrio lo vieran, lo apuntaran en su libreta a la vez y nadie pudiera mentir jamás.</div>
+              </div>
+            </div>
+
+            <!-- 2. Criptomoneda -->
+            <div class="glossary-card" data-term-id="cryptocurrency" data-category="basics" data-keywords="criptomoneda moneda dinero digital crypto satoshi">
+              <div class="glossary-card-header">
+                <span class="glossary-term-icon">🪙</span>
+                <div class="glossary-term-title-wrap">
+                  <span class="glossary-category-pill pill-basics">Básico</span>
+                  <h3>Criptomoneda</h3>
+                </div>
+              </div>
+              <p class="glossary-def">
+                Dinero 100% digital que no depende de bancos centrales, gobiernos ni empresas privadas. Su seguridad se garantiza mediante matemáticas avanzadas y criptografía.
+              </p>
+              <div class="glossary-example">
+                <span class="example-icon">💡</span>
+                <div><strong>En la vida real:</strong> Billetes digitales con número de serie único que puedes enviar a la otra punta del mundo en minutos sin pedirle permiso ni explicaciones a ningún banco.</div>
+              </div>
+            </div>
+
+            <!-- 3. Bitcoin -->
+            <div class="glossary-card" data-term-id="bitcoin" data-category="basics" data-keywords="bitcoin btc satoshi oro digital escasez 21 millones">
+              <div class="glossary-card-header">
+                <span class="glossary-term-icon">₿</span>
+                <div class="glossary-term-title-wrap">
+                  <span class="glossary-category-pill pill-basics">Básico</span>
+                  <h3>Bitcoin (BTC)</h3>
+                </div>
+              </div>
+              <p class="glossary-def">
+                La primera y más grande criptomoneda de la historia, inventada en 2009 por Satoshi Nakamoto. Tiene un límite estricto de 21 millones de unidades y jamás habrá más.
+              </p>
+              <div class="glossary-example">
+                <span class="example-icon">💡</span>
+                <div><strong>En la vida real:</strong> El «oro digital». Es reserva de valor porque su cantidad está limitada y ningún político puede pulsar un botón para fabricar más y devaluarlo.</div>
+              </div>
+            </div>
+
+            <!-- 4. Altcoin -->
+            <div class="glossary-card" data-term-id="altcoin" data-category="basics" data-keywords="altcoin moneda alternativa ethereum solana cardano">
+              <div class="glossary-card-header">
+                <span class="glossary-term-icon">🚀</span>
+                <div class="glossary-term-title-wrap">
+                  <span class="glossary-category-pill pill-basics">Básico</span>
+                  <h3>Altcoin (Moneda Alternativa)</h3>
+                </div>
+              </div>
+              <p class="glossary-def">
+                Cualquier criptomoneda que no sea Bitcoin (viene de <em>Alternative Coin</em>). Ejemplos famosos son Ethereum, Solana, Cardano o Ripple.
+              </p>
+              <div class="glossary-example">
+                <span class="example-icon">💡</span>
+                <div><strong>En la vida real:</strong> Si Bitcoin es el oro, las altcoins son como acciones de empresas tecnológicas jóvenes: pueden crecer mucho más rápido, pero con más riesgo.</div>
+              </div>
+            </div>
+
+            <!-- 5. Ethereum y Smart Contracts -->
+            <div class="glossary-card" data-term-id="ethereum" data-category="basics" data-keywords="ethereum eth smart contracts contratos inteligentes vitalik dapps">
+              <div class="glossary-card-header">
+                <span class="glossary-term-icon">💎</span>
+                <div class="glossary-term-title-wrap">
+                  <span class="glossary-category-pill pill-basics">Básico</span>
+                  <h3>Ethereum (ETH) & Smart Contracts</h3>
+                </div>
+              </div>
+              <p class="glossary-def">
+                Plataforma que inventó los «Contratos Inteligentes»: programas que se ejecutan solos sin fallar cuando se cumplen ciertas condiciones programadas.
+              </p>
+              <div class="glossary-example">
+                <span class="example-icon">💡</span>
+                <div><strong>En la vida real:</strong> Como una máquina de refrescos: si introduces el dinero y pulsas el botón, la lata sale sola. No necesitas un empleado ni un notario delante.</div>
+              </div>
+            </div>
+
+            <!-- 6. Exchange -->
+            <div class="glossary-card" data-term-id="exchange" data-category="basics" data-keywords="exchange casa cambio binance coinbase kraken comprar vender">
+              <div class="glossary-card-header">
+                <span class="glossary-term-icon">🏢</span>
+                <div class="glossary-term-title-wrap">
+                  <span class="glossary-category-pill pill-basics">Básico</span>
+                  <h3>Exchange (Casa de Cambio)</h3>
+                </div>
+              </div>
+              <p class="glossary-def">
+                Plataforma en línea donde puedes comprar, vender o cambiar criptomonedas usando euros, dólares o tus tarjetas (por ejemplo Binance, Coinbase o Kraken).
+              </p>
+              <div class="glossary-example">
+                <span class="example-icon">💡</span>
+                <div><strong>En la vida real:</strong> La casa de cambio del aeropuerto donde cambias euros por dólares antes de viajar, pero en tu móvil y con comisiones mucho más bajas.</div>
+              </div>
+            </div>
+
+            <!-- 7. Gas Fee -->
+            <div class="glossary-card" data-term-id="gasfee" data-category="basics" data-keywords="gas fee comision red tarifa transaccion mineros">
+              <div class="glossary-card-header">
+                <span class="glossary-term-icon">⛽</span>
+                <div class="glossary-term-title-wrap">
+                  <span class="glossary-category-pill pill-basics">Básico</span>
+                  <h3>Gas Fee (Comisión de Red)</h3>
+                </div>
+              </div>
+              <p class="glossary-def">
+                La pequeña comisión que pagas a los ordenadores de la red para que procesen, verifiquen y confirmen tu transacción.
+              </p>
+              <div class="glossary-example">
+                <span class="example-icon">💡</span>
+                <div><strong>En la vida real:</strong> Como el peaje de una autopista: si la carretera está saturada de tráfico, el peaje sube de precio para quien quiera pasar más rápido.</div>
+              </div>
+            </div>
+
+            <!-- 8. Halving -->
+            <div class="glossary-card" data-term-id="halving" data-category="basics" data-keywords="halving reduccion mineria 4 anos oferta escasez ciclo">
+              <div class="glossary-card-header">
+                <span class="glossary-term-icon">✂️</span>
+                <div class="glossary-term-title-wrap">
+                  <span class="glossary-category-pill pill-basics">Básico</span>
+                  <h3>Halving (Reducción a la Mitad)</h3>
+                </div>
+              </div>
+              <p class="glossary-def">
+                Evento programado en Bitcoin que ocurre cada 4 años donde la cantidad de nuevos bitcoins que se crean al día se reduce exactamente al 50%.
+              </p>
+              <div class="glossary-example">
+                <span class="example-icon">💡</span>
+                <div><strong>En la vida real:</strong> Imagina que en una mina de oro cada cuatro años solo se pudiera extraer la mitad de pepitas. Al haber menos producto nuevo, su valor tiende a subir.</div>
+              </div>
+            </div>
+
+            <!-- 9. DeFi -->
+            <div class="glossary-card" data-term-id="defi" data-category="basics" data-keywords="defi finanzas descentralizadas prestamos intereses bancos">
+              <div class="glossary-card-header">
+                <span class="glossary-term-icon">🏦</span>
+                <div class="glossary-term-title-wrap">
+                  <span class="glossary-category-pill pill-basics">Básico</span>
+                  <h3>DeFi (Finanzas Descentralizadas)</h3>
+                </div>
+              </div>
+              <p class="glossary-def">
+                Servicios financieros (préstamos, depósitos con intereses, transferencias) gestionados por programas informáticos sin intervención de bancos tradicionales.
+              </p>
+              <div class="glossary-example">
+                <span class="example-icon">💡</span>
+                <div><strong>En la vida real:</strong> Prestar dinero a otra persona en cualquier rincón del mundo y cobrar intereses mensuales directamente, sin pedir cita en una sucursal bancaria.</div>
+              </div>
+            </div>
+
+            <!-- 10. Stablecoin -->
+            <div class="glossary-card" data-term-id="stablecoin" data-category="trading" data-keywords="stablecoin moneda estable usdt usdc dolar refugio">
+              <div class="glossary-card-header">
+                <span class="glossary-term-icon">💵</span>
+                <div class="glossary-term-title-wrap">
+                  <span class="glossary-category-pill pill-trading">Trading</span>
+                  <h3>Stablecoin (Moneda Estable)</h3>
+                </div>
+              </div>
+              <p class="glossary-def">
+                Criptomoneda cuyo valor está fijado siempre a 1 dólar estadounidense (como USDT o USDC), por lo que su precio no sube ni baja de forma descontrolada.
+              </p>
+              <div class="glossary-example">
+                <span class="example-icon">💡</span>
+                <div><strong>En la vida real:</strong> Tu refugio antitormentas: cuando el mercado está cayendo con fuerza, cambias tus criptos a Stablecoins para mantener a salvo tus dólares.</div>
+              </div>
+            </div>
+
+            <!-- 11. Market Cap -->
+            <div class="glossary-card" data-term-id="marketcap" data-category="trading" data-keywords="market cap capitalizacion mercado valor total tamano">
+              <div class="glossary-card-header">
+                <span class="glossary-term-icon">📊</span>
+                <div class="glossary-term-title-wrap">
+                  <span class="glossary-category-pill pill-trading">Trading</span>
+                  <h3>Market Cap (Capitalización de Mercado)</h3>
+                </div>
+              </div>
+              <p class="glossary-def">
+                El valor económico total de una criptomoneda. Se calcula multiplicando el precio de una moneda por la cantidad total de monedas en circulación.
+              </p>
+              <div class="glossary-example">
+                <span class="example-icon">💡</span>
+                <div><strong>En la vida real:</strong> Una moneda que vale 1$ pero tiene 1.000 millones de monedas es mucho más grande que una que vale 50$ pero solo tiene 10.000 monedas.</div>
+              </div>
+            </div>
+
+            <!-- 12. ATH -->
+            <div class="glossary-card" data-term-id="ath" data-category="trading" data-keywords="ath all time high maximo historico record precio">
+              <div class="glossary-card-header">
+                <span class="glossary-term-icon">🏔️</span>
+                <div class="glossary-term-title-wrap">
+                  <span class="glossary-category-pill pill-trading">Trading</span>
+                  <h3>ATH (All-Time High / Máximo Histórico)</h3>
+                </div>
+              </div>
+              <p class="glossary-def">
+                El precio más alto al que ha cotizado una criptomoneda en toda su historia desde el día de su creación.
+              </p>
+              <div class="glossary-example">
+                <span class="example-icon">💡</span>
+                <div><strong>En la vida real:</strong> La cima más alta del monte Everest: el momento en el que cualquier persona que hubiera comprado antes estaba ganando dinero.</div>
+              </div>
+            </div>
+
+            <!-- 13. Volatilidad -->
+            <div class="glossary-card" data-term-id="volatility" data-category="trading" data-keywords="volatilidad variacion oscilacion subidas bajadas riesgo">
+              <div class="glossary-card-header">
+                <span class="glossary-term-icon">🎢</span>
+                <div class="glossary-term-title-wrap">
+                  <span class="glossary-category-pill pill-trading">Trading</span>
+                  <h3>Volatilidad</h3>
+                </div>
+              </div>
+              <p class="glossary-def">
+                La velocidad y amplitud con la que oscila el precio de una moneda hacia arriba o hacia abajo en periodos muy cortos de tiempo.
+              </p>
+              <div class="glossary-example">
+                <span class="example-icon">💡</span>
+                <div><strong>En la vida real:</strong> Una montaña rusa: un día el precio puede subir un +25% y al día siguiente corregir un -12%. Ofrece grandes oportunidades pero requiere calma.</div>
+              </div>
+            </div>
+
+            <!-- 14. Bull Market -->
+            <div class="glossary-card" data-term-id="bullmarket" data-category="trading" data-keywords="bull market mercado alcista toro subidas euforia">
+              <div class="glossary-card-header">
+                <span class="glossary-term-icon">🐂</span>
+                <div class="glossary-term-title-wrap">
+                  <span class="glossary-category-pill pill-trading">Trading</span>
+                  <h3>Bull Market (Mercado Alcista)</h3>
+                </div>
+              </div>
+              <p class="glossary-def">
+                Temporada donde la inmensa mayoría de criptomonedas suben con fuerza durante semanas o meses, y reina el optimismo generalizado entre los inversores.
+              </p>
+              <div class="glossary-example">
+                <span class="example-icon">💡</span>
+                <div><strong>En la vida real:</strong> El toro ataca empujando con sus cuernos de abajo hacia arriba: casi cualquier compra genera ganancias y el mercado está eufórico.</div>
+              </div>
+            </div>
+
+            <!-- 15. Bear Market -->
+            <div class="glossary-card" data-term-id="bearmarket" data-category="trading" data-keywords="bear market mercado bajista oso caidas panico invierno">
+              <div class="glossary-card-header">
+                <span class="glossary-term-icon">🐻</span>
+                <div class="glossary-term-title-wrap">
+                  <span class="glossary-category-pill pill-trading">Trading</span>
+                  <h3>Bear Market (Mercado Bajista)</h3>
+                </div>
+              </div>
+              <p class="glossary-def">
+                Periodo prolongado (a menudo de varios meses o años) de caídas continuas de precios, pesimismo y desinterés general del público.
+              </p>
+              <div class="glossary-example">
+                <span class="example-icon">💡</span>
+                <div><strong>En la vida real:</strong> El oso ataca con sus garras de arriba hacia abajo: los precios bajan y es el momento en el que los inversores inteligentes compran barato para el futuro.</div>
+              </div>
+            </div>
+
+            <!-- 16. Stop Loss & Take Profit -->
+            <div class="glossary-card" data-term-id="sltp" data-category="trading" data-keywords="stop loss take profit sl tp riesgo limitar perdidas asegurar ganancias">
+              <div class="glossary-card-header">
+                <span class="glossary-term-icon">🛡️</span>
+                <div class="glossary-term-title-wrap">
+                  <span class="glossary-category-pill pill-trading">Trading</span>
+                  <h3>Stop Loss & Take Profit</h3>
+                </div>
+              </div>
+              <p class="glossary-def">
+                Órdenes automáticas programadas: el Stop Loss vende si el precio cae a un límite para no perder más; el Take Profit vende cuando llega a tu meta para asegurar beneficios.
+              </p>
+              <div class="glossary-example">
+                <span class="example-icon">💡</span>
+                <div><strong>En la vida real:</strong> El cinturón de seguridad y la hucha automática: te salvan del choque si el precio se desploma y guardan tus ganancias mientras duermes.</div>
+              </div>
+            </div>
+
+            <!-- 17. Wallet -->
+            <div class="glossary-card" data-term-id="wallet" data-category="security" data-keywords="wallet billetera cartera monedero custodio fondos">
+              <div class="glossary-card-header">
+                <span class="glossary-term-icon">👛</span>
+                <div class="glossary-term-title-wrap">
+                  <span class="glossary-category-pill pill-security">Seguridad</span>
+                  <h3>Wallet (Billetera / Cartera)</h3>
+                </div>
+              </div>
+              <p class="glossary-def">
+                Aplicación o dispositivo físico que custodia tus claves criptográficas y te permite consultar tu saldo, enviar y recibir criptomonedas de forma soberana.
+              </p>
+              <div class="glossary-example">
+                <span class="example-icon">💡</span>
+                <div><strong>En la vida real:</strong> Como tu cuenta del banco personal, con la ventaja de que tú eres el único dueño y ningún director de sucursal puede bloquearte o pedirte papeles.</div>
+              </div>
+            </div>
+
+            <!-- 18. Clave Pública vs Privada -->
+            <div class="glossary-card" data-term-id="keys" data-category="security" data-keywords="clave publica direccion iban clave privada pin contrasena secretos">
+              <div class="glossary-card-header">
+                <span class="glossary-term-icon">🔑</span>
+                <div class="glossary-term-title-wrap">
+                  <span class="glossary-category-pill pill-security">Seguridad</span>
+                  <h3>Clave Pública vs Clave Privada</h3>
+                </div>
+              </div>
+              <p class="glossary-def">
+                La Clave Pública es tu dirección para recibir fondos (la compartes con cualquiera). La Clave Privada es tu contraseña secreta para autorizar envíos (¡nunca la compartes!).
+              </p>
+              <div class="glossary-example">
+                <span class="example-icon">💡</span>
+                <div><strong>En la vida real:</strong> El buzón de tu portal: cualquiera puede meter una carta por la ranura (pública), pero solo tú tienes la llave para abrirlo y sacar el dinero (privada).</div>
+              </div>
+            </div>
+
+            <!-- 19. Frase Semilla -->
+            <div class="glossary-card" data-term-id="seedphrase" data-category="security" data-keywords="frase semilla seed phrase 12 palabras 24 palabras backup recuperacion">
+              <div class="glossary-card-header">
+                <span class="glossary-term-icon">🌱</span>
+                <div class="glossary-term-title-wrap">
+                  <span class="glossary-category-pill pill-security">Seguridad</span>
+                  <h3>Frase Semilla (Seed Phrase)</h3>
+                </div>
+              </div>
+              <p class="glossary-def">
+                Lista de 12 o 24 palabras aleatorias en inglés que respaldan tu cartera completa. Si se rompe tu móvil u ordenador, con ellas restauras todo tu dinero en otro dispositivo.
+              </p>
+              <div class="glossary-example">
+                <span class="example-icon">💡</span>
+                <div><strong>En la vida real:</strong> La llave maestra universal de tu caja fuerte. Si alguien la ve, tiene todo tu dinero. Se escribe a mano en papel y se guarda en un sitio seguro.</div>
+              </div>
+            </div>
+
+            <!-- 20. Cold Wallet -->
+            <div class="glossary-card" data-term-id="coldwallet" data-category="security" data-keywords="cold wallet cartera fria ledger trezor hardware desconectado">
+              <div class="glossary-card-header">
+                <span class="glossary-term-icon">🧊</span>
+                <div class="glossary-term-title-wrap">
+                  <span class="glossary-category-pill pill-security">Seguridad</span>
+                  <h3>Cold Wallet (Cartera Fría / Hardware)</h3>
+                </div>
+              </div>
+              <p class="glossary-def">
+                Dispositivo físico similar a un USB (como Ledger o Trezor) que almacena tus claves completamente desconectadas de internet para blindarte ante hackers.
+              </p>
+              <div class="glossary-example">
+                <span class="example-icon">💡</span>
+                <div><strong>En la vida real:</strong> Una caja fuerte enterrada sin conexión de red: ningún pirata informático puede acceder a ella porque está desconectada físicamente del mundo digital.</div>
+              </div>
+            </div>
+
+            <!-- 21. Hot Wallet -->
+            <div class="glossary-card" data-term-id="hotwallet" data-category="security" data-keywords="hot wallet cartera caliente metamask phantom app movil extension">
+              <div class="glossary-card-header">
+                <span class="glossary-term-icon">🔥</span>
+                <div class="glossary-term-title-wrap">
+                  <span class="glossary-category-pill pill-security">Seguridad</span>
+                  <h3>Hot Wallet (Cartera Caliente)</h3>
+                </div>
+              </div>
+              <p class="glossary-def">
+                Billetera conectada a internet, generalmente una extensión del navegador o app móvil (como MetaMask o Phantom), ideal para operar en el día a día.
+              </p>
+              <div class="glossary-example">
+                <span class="example-icon">💡</span>
+                <div><strong>En la vida real:</strong> La cartera que llevas en el bolsillo con unos billetes para pagar el café y el almuerzo: práctica y rápida, pero no donde guardas todos tus ahorros.</div>
+              </div>
+            </div>
+
+            <!-- 22. HODL -->
+            <div class="glossary-card" data-term-id="hodl" data-category="slang" data-keywords="hodl hold mantener paciencia largo plazo no vender">
+              <div class="glossary-card-header">
+                <span class="glossary-term-icon">✊</span>
+                <div class="glossary-term-title-wrap">
+                  <span class="glossary-category-pill pill-slang">Jerga</span>
+                  <h3>HODL (Mantener a Largo Plazo)</h3>
+                </div>
+              </div>
+              <p class="glossary-def">
+                Estrategia de guardar tus criptomonedas y no venderlas durante años, pase lo que pase con el precio a corto plazo. Nació de una errata ("I AM HODLING") en un foro de 2013.
+              </p>
+              <div class="glossary-example">
+                <span class="example-icon">💡</span>
+                <div><strong>En la vida real:</strong> Paciencia de titanio: no asustarse si hoy llueve, porque sabes que el árbol que plantaste dará frutos en unos años.</div>
+              </div>
+            </div>
+
+            <!-- 23. FOMO -->
+            <div class="glossary-card" data-term-id="fomo" data-category="slang" data-keywords="fomo fear missing out miedo quedarse fuera compras impulsivas euforia">
+              <div class="glossary-card-header">
+                <span class="glossary-term-icon">😱</span>
+                <div class="glossary-term-title-wrap">
+                  <span class="glossary-category-pill pill-slang">Jerga</span>
+                  <h3>FOMO (Miedo a Quedarse Fuera)</h3>
+                </div>
+              </div>
+              <p class="glossary-def">
+                <em>Fear Of Missing Out</em>: la ansiedad impulsiva de comprar una criptomoneda que ya ha subido muchísimo porque ves a otros presumiendo ganancias y no quieres quedarte atrás.
+              </p>
+              <div class="glossary-example">
+                <span class="example-icon">💡</span>
+                <div><strong>En la vida real:</strong> Pagar una entrada abusiva a un revendedor en la puerta de una discoteca porque te dijeron que la fiesta es histórica, para entrar y que se acabe la música.</div>
+              </div>
+            </div>
+
+            <!-- 24. FUD -->
+            <div class="glossary-card" data-term-id="fud" data-category="slang" data-keywords="fud fear uncertainty doubt noticias falsas rumores panico">
+              <div class="glossary-card-header">
+                <span class="glossary-term-icon">📰</span>
+                <div class="glossary-term-title-wrap">
+                  <span class="glossary-category-pill pill-slang">Jerga</span>
+                  <h3>FUD (Miedo, Incertidumbre y Duda)</h3>
+                </div>
+              </div>
+              <p class="glossary-def">
+                <em>Fear, Uncertainty and Doubt</em>: rumores negativos o noticias sensacionalistas diseñadas para asustar al público y provocar ventas por pánico para que los precios caigan.
+              </p>
+              <div class="glossary-example">
+                <span class="example-icon">💡</span>
+                <div><strong>En la vida real:</strong> Difundir el rumor en un pueblo de que se va a cortar el agua para que la gente salga corriendo histérica a vaciar los supermercados.</div>
+              </div>
+            </div>
+
+            <!-- 25. Ballena -->
+            <div class="glossary-card" data-term-id="whale" data-category="slang" data-keywords="ballena whale grandes inversores fondos mover mercado volumen">
+              <div class="glossary-card-header">
+                <span class="glossary-term-icon">🐋</span>
+                <div class="glossary-term-title-wrap">
+                  <span class="glossary-category-pill pill-slang">Jerga</span>
+                  <h3>Ballena (Whale)</h3>
+                </div>
+              </div>
+              <p class="glossary-def">
+                Un inversor individual o fondo que tiene tantísimas criptomonedas que sus compras o ventas mueven el precio de todo el mercado de golpe.
+              </p>
+              <div class="glossary-example">
+                <span class="example-icon">💡</span>
+                <div><strong>En la vida real:</strong> Si un pez pequeño se mueve en la piscina nadie lo nota; pero si una ballena salta, crea una ola gigante que salpica a todos los bañistas.</div>
+              </div>
+            </div>
+
+            <!-- 26. Airdrop -->
+            <div class="glossary-card" data-term-id="airdrop" data-category="slang" data-keywords="airdrop regalo tokens gratis premio comunidad marketing">
+              <div class="glossary-card-header">
+                <span class="glossary-term-icon">🪂</span>
+                <div class="glossary-term-title-wrap">
+                  <span class="glossary-category-pill pill-slang">Jerga</span>
+                  <h3>Airdrop (Regalo de Tokens)</h3>
+                </div>
+              </div>
+              <p class="glossary-def">
+                Distribución gratuita de criptomonedas directamente en la cartera de los usuarios para premiar que probaron una plataforma nueva y para darse a conocer.
+              </p>
+              <div class="glossary-example">
+                <span class="example-icon">💡</span>
+                <div><strong>En la vida real:</strong> Las muestras gratuitas de perfume o producto que te regalan en una tienda para que lo pruebes y se lo cuentes a tus conocidos.</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Modal Detail & Multi-timeframe Chart -->
+    <div id="coin-modal" class="modal-overlay hidden">
+      <div class="modal-content">
+        <button class="modal-close" aria-label="Cerrar">&times;</button>
+        <div class="modal-header">
+          <img id="modal-coin-img" src="" alt="Coin" class="modal-coin-img">
+          <div class="modal-coin-info">
+            <h2 id="modal-coin-name"></h2>
+            <span id="modal-coin-symbol" class="modal-symbol"></span>
+          </div>
+        </div>
+        <div class="modal-body">
+          <div class="modal-stats-grid">
+            <div class="modal-stat">
+              <span class="stat-label">Precio</span>
+              <span id="modal-price" class="stat-value"></span>
+            </div>
+            <div class="modal-stat">
+              <span class="stat-label">Cambio 24h</span>
+              <span id="modal-change" class="stat-value"></span>
+            </div>
+            <div class="modal-stat">
+              <span class="stat-label">Cap. Mercado</span>
+              <span id="modal-mcap" class="stat-value"></span>
+            </div>
+            <div class="modal-stat">
+              <span class="stat-label">Volumen 24h</span>
+              <span id="modal-volume" class="stat-value"></span>
+            </div>
+            <div class="modal-stat">
+              <span class="stat-label">ATH</span>
+              <span id="modal-ath" class="stat-value"></span>
+            </div>
+          </div>
+          
+          <div class="chart-section">
+            <h3 class="section-title">Evolución de Precio</h3>
+            <div class="timeframe-buttons">
+              <button class="tf-btn" data-tf="1m">1 Min</button>
+              <button class="tf-btn" data-tf="5m">5 Min</button>
+              <button class="tf-btn" data-tf="15m">15 Min</button>
+              <button class="tf-btn active" data-tf="1h">1 Hora</button>
+              <button class="tf-btn" data-tf="1S">1 Sem</button>
+              <button class="tf-btn" data-tf="1M">1 Mes</button>
+            </div>
+            <div class="chart-container">
+              <canvas id="chart-canvas" class="chart-canvas" width="600" height="250"></canvas>
+              <div id="chart-tooltip" class="chart-tooltip"></div>
+              <div id="chart-loading" class="chart-loading hidden">
+                <div class="spinner"></div>
+              </div>
+            </div>
+          </div>
+          
+          <button id="modal-buy-btn" class="btn btn-primary modal-buy-btn">🛒 Comprar esta cripto</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit Stop Loss / Take Profit Modal -->
+    <div id="edit-sltp-modal" class="modal-overlay hidden">
+      <div class="modal-content sltp-modal-content">
+        <button class="modal-close" id="edit-sltp-close">&times;</button>
+        <div class="modal-header">
+          <img id="edit-sltp-coin-img" src="" alt="" class="modal-coin-icon">
+          <div>
+            <h2 id="edit-sltp-coin-name" style="font-size:1.25rem;" data-i18n="edit_sltp_title">Configurar SL / TP</h2>
+            <span id="edit-sltp-coin-symbol" class="modal-coin-symbol"></span>
+          </div>
+        </div>
+
+        <div class="edit-sltp-body" style="margin-top:14px;">
+          <div class="current-price-info-card">
+            <div class="price-info-item">
+              <span class="info-label" data-i18n="current_price_label">Precio Actual:</span>
+              <strong id="edit-sltp-current-price" class="info-value">$0.00</strong>
+            </div>
+            <div class="price-info-item">
+              <span class="info-label" data-i18n="buy_price_label">Precio de Compra:</span>
+              <strong id="edit-sltp-buy-price" class="info-value">$0.00</strong>
+            </div>
+          </div>
+
+          <div class="sltp-inputs-grid" style="margin-top: 14px;">
+            <!-- Stop Loss -->
+            <div class="sltp-box sl-box">
+              <div class="sltp-box-header">
+                <label for="edit-sl-input">🛡️ Stop Loss ($)</label>
+                <span class="sltp-calc-badge" id="edit-sl-badge">—</span>
+              </div>
+              <input type="number" id="edit-sl-input" class="form-control" placeholder="Sin Stop Loss" data-i18n-ph="no_sl_ph" step="any" min="0">
+              <div class="sltp-chips-row">
+                <button type="button" class="sltp-chip sl-chip edit-sl-chip" data-pct="-3">-3%</button>
+                <button type="button" class="sltp-chip sl-chip edit-sl-chip" data-pct="-5">-5%</button>
+                <button type="button" class="sltp-chip sl-chip edit-sl-chip" data-pct="-10">-10%</button>
+                <button type="button" class="sltp-chip sl-chip edit-sl-chip-clear" style="color:var(--text-muted);" title="Quitar Stop Loss">✕</button>
+              </div>
+            </div>
+
+            <!-- Take Profit -->
+            <div class="sltp-box tp-box">
+              <div class="sltp-box-header">
+                <label for="edit-tp-input">🎯 Take Profit ($)</label>
+                <span class="sltp-calc-badge" id="edit-tp-badge">—</span>
+              </div>
+              <input type="number" id="edit-tp-input" class="form-control" placeholder="Sin Take Profit" data-i18n-ph="no_tp_ph" step="any" min="0">
+              <div class="sltp-chips-row">
+                <button type="button" class="sltp-chip tp-chip edit-tp-chip" data-pct="5">+5%</button>
+                <button type="button" class="sltp-chip tp-chip edit-tp-chip" data-pct="10">+10%</button>
+                <button type="button" class="sltp-chip tp-chip edit-tp-chip" data-pct="25">+25%</button>
+                <button type="button" class="sltp-chip tp-chip edit-tp-chip-clear" style="color:var(--text-muted);" title="Quitar Take Profit">✕</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="sltp-note" style="margin-top:10px;">
+            ⚡ <em data-i18n="sltp_modal_note">Las órdenes se ejecutan y cierran la posición automáticamente en cuanto el mercado alcance estos precios.</em>
+          </div>
+
+          <div class="modal-actions-row" style="margin-top: 16px; display:flex; gap:10px;">
+            <button type="button" id="save-sltp-btn" class="btn btn-primary" style="flex:1;" data-i18n="btn_save_targets">💾 Guardar Objetivos</button>
+            <button type="button" id="cancel-sltp-btn" class="btn btn-secondary" style="background:rgba(255,255,255,0.06);color:var(--text-secondary);" data-i18n="btn_cancel">Cancelar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sell Holding Modal (Vender parcial o total) -->
+    <div id="sell-modal" class="modal-overlay hidden">
+      <div class="modal-content sell-modal-content" style="max-width: 480px;">
+        <button class="modal-close" id="sell-modal-close" aria-label="Cerrar">&times;</button>
+        <div class="modal-header">
+          <img id="sell-modal-coin-img" src="" alt="" class="modal-coin-icon">
+          <div>
+            <h2 id="sell-modal-coin-name" style="font-size:1.25rem;" data-i18n="sell_modal_title">Vender Criptomoneda</h2>
+            <span id="sell-modal-coin-symbol" class="modal-coin-symbol"></span>
+          </div>
+        </div>
+
+        <div class="sell-modal-body" style="margin-top:14px;">
+          <!-- Price and Holdings Info -->
+          <div class="current-price-info-card">
+            <div class="price-info-item">
+              <span class="info-label" data-i18n="sell_current_price">Precio Actual:</span>
+              <strong id="sell-modal-current-price" class="info-value">$0.00</strong>
+            </div>
+            <div class="price-info-item">
+              <span class="info-label" data-i18n="sell_total_balance">En Cartera:</span>
+              <strong id="sell-modal-total-holding" class="info-value">0.00</strong>
+            </div>
+            <div class="price-info-item">
+              <span class="info-label" data-i18n="sell_total_value">Valor Total:</span>
+              <strong id="sell-modal-total-value" class="info-value">$0.00</strong>
+            </div>
+          </div>
+
+          <!-- Sell Amount Input -->
+          <div style="margin-top: 16px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <label for="sell-token-amount-input" style="font-size:0.85rem; font-weight:600; color:var(--text-secondary);" data-i18n="sell_amount_label">Cantidad a vender:</label>
+              <span id="sell-pct-indicator" style="font-size:0.8rem; font-weight:700; color:var(--primary-accent);">100%</span>
+            </div>
+            <div style="position:relative; display:flex; align-items:center;">
+              <input type="number" id="sell-token-amount-input" class="form-control" placeholder="0.00" step="any" min="0" style="padding-right: 70px; font-size:1.05rem; font-weight:600;">
+              <span id="sell-input-symbol-badge" style="position:absolute; right:12px; font-size:0.8rem; font-weight:700; color:var(--text-muted); pointer-events:none;">BTC</span>
+            </div>
+          </div>
+
+          <!-- Quick Percentage Chips -->
+          <div class="sltp-chips-row" style="margin-top: 10px; display:flex; gap:8px;">
+            <button type="button" class="sltp-chip sell-pct-chip" data-pct="25" style="flex:1;">25%</button>
+            <button type="button" class="sltp-chip sell-pct-chip" data-pct="50" style="flex:1;">50%</button>
+            <button type="button" class="sltp-chip sell-pct-chip" data-pct="75" style="flex:1;">75%</button>
+            <button type="button" class="sltp-chip sell-pct-chip" data-pct="100" style="flex:1; background:rgba(239,68,68,0.18); border-color:#ef4444; color:#ef4444; font-weight:700;">100% (Todo)</button>
+          </div>
+
+          <!-- Live Calculation Summary Card -->
+          <div class="sell-summary-card" style="margin-top: 16px; background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.08); border-radius:var(--border-radius-sm); padding:12px 14px;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+              <span style="font-size:0.82rem; color:var(--text-muted);" data-i18n="sell_estimated_receive">Total a recibir:</span>
+              <strong id="sell-receive-usd" style="font-size:0.95rem; color:#22c55e;">$0.00 USD</strong>
+            </div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+              <span style="font-size:0.82rem; color:var(--text-muted);" data-i18n="sell_estimated_pnl">PnL estimado (Ganancia/Pérdida):</span>
+              <strong id="sell-estimated-pnl" style="font-size:0.85rem; color:var(--text-primary);">—</strong>
+            </div>
+            <div style="display:flex; justify-content:space-between;">
+              <span style="font-size:0.82rem; color:var(--text-muted);" data-i18n="sell_remaining_balance">Saldo restante en cartera:</span>
+              <span id="sell-remaining-holding" style="font-size:0.82rem; color:var(--text-secondary);">0.00</span>
+            </div>
+          </div>
+
+          <div class="modal-actions-row" style="margin-top: 18px; display:flex; gap:10px;">
+            <button type="button" id="confirm-sell-btn" class="btn btn-danger" style="flex:1; background:#ef4444; color:#fff; border:none; padding:12px; font-weight:700; cursor:pointer; border-radius:var(--border-radius-sm);" data-i18n="sell_btn_confirm">🔥 Confirmar Venta</button>
+            <button type="button" id="cancel-sell-btn" class="btn btn-secondary" style="background:rgba(255,255,255,0.06); color:var(--text-secondary); border:1px solid rgba(255,255,255,0.1); padding:12px 16px; cursor:pointer; border-radius:var(--border-radius-sm);" data-i18n="sell_btn_cancel">Cancelar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stripe Checkout Modal (Simulación de Pruebas) -->
+    <div id="stripe-checkout-modal" class="modal-overlay hidden">
+      <div class="modal-content stripe-modal-content">
+        <button class="modal-close" id="stripe-modal-close" aria-label="Cerrar">&times;</button>
+        
+        <div class="stripe-modal-header">
+          <div class="stripe-header-title">
+            <img src="img/logo-icon.png" alt="Logo" style="width: 26px; height: 26px; object-fit: contain; vertical-align: middle;">
+            <span class="stripe-brand-tag">Stripe Simulator</span>
+            <h3 data-i18n="stripe_modal_title">Simulación de Pasarela de Pago</h3>
+          </div>
+          <span style="font-size:0.75rem; color:#38bdf8; font-weight:700; background:rgba(56,189,248,0.15); padding:3px 8px; border-radius:12px; border:1px solid rgba(56,189,248,0.3);" data-i18n="stripe_sandbox_pill">🧪 Modo Pruebas</span>
+        </div>
+
+        <!-- Simulation Environment Banner -->
+        <div class="stripe-simulation-banner">
+          <div class="sim-banner-top">
+            <span class="sim-pill" data-i18n="stripe_test_banner">⚡ TEST SANDBOX ACTIVO</span>
+            <span class="sim-subtext" data-i18n="stripe_test_desc">Simula el cobro y activa el acceso PRO sin cargos reales.</span>
+          </div>
+          <button type="button" id="stripe-fill-demo-btn" class="btn-fill-demo-card" data-i18n="btn_autofill_card">
+            ⚡ Rellenar tarjeta de prueba (Testnet 4242)
+          </button>
+        </div>
+
+        <!-- Plan Summary -->
+        <div class="stripe-plan-summary-card">
+          <div class="plan-summary-info">
+            <h4 id="stripe-summary-plan-name">Plan Pro Anual</h4>
+            <p id="stripe-summary-plan-desc">Acceso ilimitado a todas las herramientas PRO</p>
+          </div>
+          <div class="plan-summary-price" id="stripe-summary-plan-price">$69.99</div>
+        </div>
+
+        <!-- Stripe Form -->
+        <form id="stripe-checkout-form" onsubmit="return false;">
+          <div class="stripe-field-group">
+            <label for="stripe-card-name" data-i18n="label_card_name">Titular de la Tarjeta</label>
+            <div class="stripe-input-wrapper">
+              <span class="input-icon">👤</span>
+              <input type="text" id="stripe-card-name" placeholder="Ej. Trader Demo PRO" data-i18n-ph="ph_card_name" required autocomplete="cc-name">
+            </div>
+          </div>
+
+          <div class="stripe-field-group">
+            <label for="stripe-card-email" data-i18n="label_card_email">Correo Electrónico para Factura Simulada</label>
+            <div class="stripe-input-wrapper">
+              <span class="input-icon">✉️</span>
+              <input type="email" id="stripe-card-email" placeholder="demo@criptotracker.pro" required autocomplete="email">
+            </div>
+          </div>
+
+          <div class="stripe-field-group">
+            <label for="stripe-card-number" data-i18n="label_card_number">Número de Tarjeta</label>
+            <div class="stripe-input-wrapper">
+              <span class="input-icon">💳</span>
+              <input type="text" id="stripe-card-number" placeholder="4242  4242  4242  4242" maxlength="19" required autocomplete="cc-number">
+            </div>
+          </div>
+
+          <div class="stripe-card-row">
+            <div class="stripe-field-group">
+              <label for="stripe-card-exp" data-i18n="label_card_exp">Caducidad</label>
+              <div class="stripe-input-wrapper">
+                <span class="input-icon">📅</span>
+                <input type="text" id="stripe-card-exp" placeholder="MM/AA (ej. 12/28)" data-i18n-ph="ph_card_exp" maxlength="5" required autocomplete="cc-exp">
+              </div>
+            </div>
+
+            <div class="stripe-field-group">
+              <label for="stripe-card-cvc" data-i18n="label_card_cvc">CVC</label>
+              <div class="stripe-input-wrapper">
+                <span class="input-icon">🔒</span>
+                <input type="password" id="stripe-card-cvc" placeholder="888" maxlength="4" required autocomplete="cc-csc">
+              </div>
+            </div>
+          </div>
+
+          <div class="stripe-guarantee-note">
+            <span>🧪</span>
+            <span data-i18n="stripe_guarantee">Simulación interactiva de Stripe para periodo de pruebas. Los activos y funciones PRO se activan inmediatamente en local.</span>
+          </div>
+
+          <button type="submit" id="stripe-submit-btn" class="btn-stripe-pay">
+            <span data-i18n="btn_stripe_pay_text">🧪 Simular Pago Aprobado</span> <span id="stripe-btn-amount">$69.99 USD</span>
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Dark Luxury Auth Modal -->
+    <div id="auth-modal" class="modal-overlay auth-modal-overlay hidden" aria-hidden="true" role="dialog" aria-labelledby="auth-modal-title">
+      <div class="modal-content auth-modal-content">
+        <button class="modal-close auth-modal-close" id="auth-modal-close" aria-label="Cerrar">&times;</button>
+        
+        <!-- Auth Header -->
+        <div class="auth-card-header">
+          <div class="auth-badge-glow">
+            <img src="img/logo-icon.png" alt="CryptoTracker.Pro" width="36" height="36">
+          </div>
+          <h2 id="auth-modal-title" class="auth-title" data-i18n="auth_title">Acceso CryptoTracker.Pro</h2>
+          <p class="auth-subtitle" data-i18n="auth_subtitle">Sincroniza tu portfolio y favoritos en Web, Android e iPhone</p>
+        </div>
+
+        <!-- Auth Tabs: Iniciar Sesión / Registrarse -->
+        <div class="auth-nav-tabs" id="auth-nav-tabs">
+          <button type="button" class="auth-tab-btn active" id="auth-tab-login" data-tab="login" data-i18n="auth_tab_login">Iniciar Sesión</button>
+          <button type="button" class="auth-tab-btn" id="auth-tab-register" data-tab="register" data-i18n="auth_tab_register">Crear Cuenta</button>
+        </div>
+
+        <!-- Social 1-Click Buttons -->
+        <div class="auth-social-group" id="auth-social-group">
+          <!-- Continuar con Apple -->
+          <button type="button" class="btn-auth-social btn-auth-apple" id="btn-auth-apple">
+            <svg class="social-icon-svg" viewBox="0 0 170 170" width="18" height="18" fill="currentColor">
+              <path d="M150.37 130.25c-2.45 5.66-5.35 10.87-8.71 15.66-4.58 6.53-8.33 11.05-11.22 13.56-4.48 4.12-9.28 6.23-14.42 6.35-3.69 0-8.14-1.05-13.32-3.18-5.19-2.12-9.97-3.17-14.34-3.17-4.58 0-9.49 1.05-14.75 3.17-5.26 2.13-9.5 3.24-12.74 3.35-4.35.13-9.16-1.9-14.42-6.08-3.7-3.04-7.6-7.79-11.71-14.25-5.75-9.01-10.36-19.12-13.82-30.34-3.46-11.21-5.19-21.73-5.19-31.55 0-13.25 3.27-24.37 9.81-33.36 6.54-8.99 14.88-13.6 25.02-13.82 4.9 0 10.15 1.28 15.75 3.84 5.6 2.56 9.38 3.89 11.34 4 1.53-.11 5.43-1.46 11.71-4.04 6.28-2.58 11.77-3.77 16.47-3.57 9.27.52 17.13 4.22 23.57 11.11-8.18 4.99-12.18 11.87-12 20.65.18 7.27 2.92 13.38 8.21 18.32 5.29 4.94 11.59 7.74 18.9 8.41-1.62 5.2-3.62 10.4-6 15.61zM119.22 31.84c0-7.39 2.67-14.07 8.01-20.04 5.34-5.97 11.8-9.97 19.38-12 1.08 7.39-1.29 14.25-7.11 20.58-5.82 6.33-12.58 10.16-20.28 11.46z"/>
+            </svg>
+            <span data-i18n="auth_btn_apple">Continuar con Apple</span>
+          </button>
+
+          <!-- Continuar con Google -->
+          <button type="button" class="btn-auth-social btn-auth-google" id="btn-auth-google">
+            <svg class="social-icon-svg" viewBox="0 0 24 24" width="18" height="18">
+              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+            </svg>
+            <span data-i18n="auth_btn_google">Continuar con Google</span>
+          </button>
+        </div>
+
+        <div class="auth-divider" id="auth-divider">
+          <span data-i18n="auth_divider_or">o con correo electrónico</span>
+        </div>
+
+        <!-- Botón Volver (para flujo social) -->
+        <button type="button" class="auth-back-btn" id="auth-back-btn" style="display:none;">
+          <span>←</span> <span data-i18n="auth_back_options">Volver a todas las opciones</span>
+        </button>
+
+        <!-- Formulario -->
+        <form id="auth-form" class="auth-form">
+          <div class="auth-field" id="auth-field-name" style="display:none;">
+            <label for="auth-input-name" class="auth-label" data-i18n="auth_label_name">Nombre Completo</label>
+            <div class="auth-input-wrap">
+              <span class="auth-input-icon">👤</span>
+              <input type="text" id="auth-input-name" class="auth-input" placeholder="Satoshi Nakamoto" autocomplete="name">
+            </div>
+          </div>
+
+          <div class="auth-field">
+            <label for="auth-input-email" class="auth-label" data-i18n="auth_label_email">Correo Electrónico</label>
+            <div class="auth-input-wrap">
+              <span class="auth-input-icon">✉️</span>
+              <input type="email" id="auth-input-email" class="auth-input" placeholder="tu@email.com" required autocomplete="email">
+            </div>
+          </div>
+
+          <div class="auth-field">
+            <div class="auth-label-row">
+              <label for="auth-input-password" class="auth-label" data-i18n="auth_label_password">Contraseña</label>
+              <button type="button" class="auth-forgot-link" id="auth-forgot-link" data-i18n="auth_forgot_password">¿Olvidaste tu contraseña?</button>
+            </div>
+            <div class="auth-input-wrap">
+              <span class="auth-input-icon">🔒</span>
+              <input type="password" id="auth-input-password" class="auth-input" placeholder="••••••••" required autocomplete="current-password">
+              <button type="button" class="auth-toggle-pwd" id="auth-toggle-pwd" aria-label="Mostrar contraseña">👁️</button>
+            </div>
+          </div>
+
+          <div class="auth-checkbox-row">
+            <label class="auth-remember-label">
+              <input type="checkbox" id="auth-remember-check" checked>
+              <span data-i18n="auth_remember_me">Mantener sesión iniciada</span>
+            </label>
+          </div>
+
+          <button type="submit" id="auth-submit-btn" class="btn-auth-submit">
+            <span class="btn-submit-icon">✨</span>
+            <span id="auth-submit-text" data-i18n="auth_btn_submit_login">Entrar a mi Cuenta</span>
+          </button>
+        </form>
+
+        <!-- User Profile Card (Shown when logged in) -->
+        <div id="auth-profile-card" class="auth-profile-card" style="display:none;">
+          <div class="profile-avatar-wrap">
+            <div class="profile-avatar" id="profile-avatar">S</div>
+            <div class="profile-tier-badge">💎 PRO</div>
+          </div>
+          <div class="profile-info">
+            <h3 class="profile-name" id="profile-name">Inversor PRO</h3>
+            <p class="profile-email" id="profile-email">usuario@criptotracker.pro</p>
+            <div class="profile-sync-status">
+              <span class="sync-dot live"></span>
+              <span data-i18n="auth_sync_status">Cartera y favoritos sincronizados en la nube</span>
+            </div>
+          </div>
+          <div class="profile-stats-mini">
+            <div class="pstat-item">
+              <span class="pstat-label" data-i18n="auth_stat_device">Plataformas Sincronizadas</span>
+              <span class="pstat-val">Web + iOS + Android</span>
+            </div>
+            <div class="pstat-item">
+              <span class="pstat-label" data-i18n="auth_stat_portfolio">Saldo en Cartera</span>
+              <span class="pstat-val" id="profile-portfolio-val">$10,000.00</span>
+            </div>
+          </div>
+          <div class="profile-actions">
+            <button type="button" class="btn-profile-sync" id="btn-profile-sync">
+              <span>🔄</span> <span data-i18n="auth_btn_sync_now">Sincronizar Ahora</span>
+            </button>
+            <button type="button" class="btn-profile-logout" id="btn-profile-logout">
+              <span>🚪</span> <span data-i18n="auth_btn_logout">Cerrar Sesión</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Portfolio FAB -->
+    <div id="portfolio-fab" class="portfolio-fab" aria-label="Ir a mi Portfolio">
+      <span>💼</span> <span id="fab-value">$10,000.00</span>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="toast-container"></div>
+  </div>
+
+  <script src="js/api.js?v=10.0"></script>
+  <script src="js/favorites.js?v=10.0"></script>
+  <script src="js/simulator.js?v=10.0"></script>
+  <script src="js/i18n.js?v=1.0"></script>
+  <script src="js/achievements.js?v=1.0"></script>
+  <!-- Firebase App & Auth SDK (v10 compat) -->
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="js/auth.js?v=2.0"></script>
+  <script src="js/app.js?v=10.1"></script>
+</body>
+</html>

@@ -1,0 +1,56 @@
+
+> Configure project :app
+WARNING: Using flatDir should be avoided because it doesn't support any meta-data formats.
+
+> Configure project :capacitor-cordova-android-plugins
+WARNING: Using flatDir should be avoided because it doesn't support any meta-data formats.
+
+> Task :app:signingReport
+Variant: debug
+Config: debug
+Store: /Users/fred/.android/debug.keystore
+Alias: AndroidDebugKey
+MD5: 61:A0:A1:7B:96:60:FC:D8:B7:7B:88:E4:80:96:07:0F
+SHA1: 10:F9:D4:0E:1E:32:66:BB:B6:D2:43:CC:7D:10:FB:BB:22:0E:A2:20
+SHA-256: D1:E4:23:B7:CB:13:80:CA:CC:E1:0D:B9:D9:1E:6C:B8:BF:E5:1C:E6:B1:7D:8D:35:31:9D:7C:5E:97:64:9D:33
+Valid until: sábado, 15 de abril de 2056
+----------
+Variant: release
+Config: null
+Store: null
+Alias: null
+----------
+Variant: debugAndroidTest
+Config: debug
+Store: /Users/fred/.android/debug.keystore
+Alias: AndroidDebugKey
+MD5: 61:A0:A1:7B:96:60:FC:D8:B7:7B:88:E4:80:96:07:0F
+SHA1: 10:F9:D4:0E:1E:32:66:BB:B6:D2:43:CC:7D:10:FB:BB:22:0E:A2:20
+SHA-256: D1:E4:23:B7:CB:13:80:CA:CC:E1:0D:B9:D9:1E:6C:B8:BF:E5:1C:E6:B1:7D:8D:35:31:9D:7C:5E:97:64:9D:33
+Valid until: sábado, 15 de abril de 2056
+----------
+
+> Task :capacitor-android:signingReport
+Variant: debugAndroidTest
+Config: debug
+Store: /Users/fred/.android/debug.keystore
+Alias: AndroidDebugKey
+MD5: 61:A0:A1:7B:96:60:FC:D8:B7:7B:88:E4:80:96:07:0F
+SHA1: 10:F9:D4:0E:1E:32:66:BB:B6:D2:43:CC:7D:10:FB:BB:22:0E:A2:20
+SHA-256: D1:E4:23:B7:CB:13:80:CA:CC:E1:0D:B9:D9:1E:6C:B8:BF:E5:1C:E6:B1:7D:8D:35:31:9D:7C:5E:97:64:9D:33
+Valid until: sábado, 15 de abril de 2056
+----------
+
+> Task :capacitor-cordova-android-plugins:signingReport
+Variant: debugAndroidTest
+Config: debug
+Store: /Users/fred/.android/debug.keystore
+Alias: AndroidDebugKey
+MD5: 61:A0:A1:7B:96:60:FC:D8:B7:7B:88:E4:80:96:07:0F
+SHA1: 10:F9:D4:0E:1E:32:66:BB:B6:D2:43:CC:7D:10:FB:BB:22:0E:A2:20
+SHA-256: D1:E4:23:B7:CB:13:80:CA:CC:E1:0D:B9:D9:1E:6C:B8:BF:E5:1C:E6:B1:7D:8D:35:31:9D:7C:5E:97:64:9D:33
+Valid until: sábado, 15 de abril de 2056
+----------
+
+BUILD SUCCESSFUL in 619ms
+3 actionable tasks: 3 executed

@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "74265939519",
+    "project_id": "criptotracker-pro",
+    "storage_bucket": "criptotracker-pro.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:74265939519:android:549a3d435b5bb56ae2b28a",
+        "android_client_info": {
+          "package_name": "pro.criptotracker.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "74265939519-jh2d0vk385jrvcj04r65m163hh2pgs61.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "pro.criptotracker.app",
+            "certificate_hash": "10f9d40e1e3266bbb6d243cc7d10fbbb220ea220"
+          }
+        },
+        {
+          "client_id": "74265939519-g2ov9ecej849ms4hkg0agrd18g3v99sl.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBocuoxvfSEUKKrzIpDrd522sLdHveSih8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "74265939519-g2ov9ecej849ms4hkg0agrd18g3v99sl.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "74265939519-tj51ba093tk8e0re0347v3peoa6ghv2a.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "pro.criptotracker.app"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

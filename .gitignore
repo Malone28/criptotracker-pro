@@ -4,3 +4,11 @@ node_modules/
 *.log
 1reel.jpeg
 reels_separados/
+.env*
+*.aab
+*.apk
+*.keystore
+playstore_assets/
+imag_vid_audios/
+*.mov
+*.mp4

@@ -35,7 +35,10 @@ window.CryptoAPI = (function() {
   async function fetchWithRetry(url, retries = 3) {
     for (let i = 0; i < retries; i++) {
       try {
-        const response = await fetch(url);
+        const controller = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+        const timer = controller ? setTimeout(function() { controller.abort(); }, 7000) : null;
+        const response = await fetch(url, controller ? { signal: controller.signal } : undefined);
+        if (timer) clearTimeout(timer);
         if (response.status === 429) {
           // Rate limited — wait longer
           console.warn('CoinGecko rate limited, backing off...');

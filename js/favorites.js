@@ -21,6 +21,9 @@ window.Favorites = (function() {
   function save() {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify([...favorites]));
+      if (window.CriptoAuth && window.CriptoAuth.saveCloudData) {
+        window.CriptoAuth.saveCloudData();
+      }
     } catch (e) {
       console.error("Failed to save favorites:", e);
     }
@@ -44,5 +47,5 @@ window.Favorites = (function() {
   
   load();
   
-  return { toggle, isFavorite, getAll, count };
+  return { toggle, isFavorite, getAll, count, reload: load };
 })();

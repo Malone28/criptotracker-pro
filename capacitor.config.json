@@ -1,0 +1,22 @@
+{
+  "appId": "pro.criptotracker.app",
+  "appName": "CryptoTracker.Pro",
+  "webDir": "www",
+  "server": {
+    "allowNavigation": [
+      "criptotracker-pro.firebaseapp.com",
+      "criptotracker-pro.web.app",
+      "criptotracker.pro",
+      "accounts.google.com",
+      "appleid.apple.com",
+      "*.google.com",
+      "*.apple.com"
+    ]
+  },
+  "plugins": {
+    "FirebaseAuthentication": {
+      "skipNativeAuth": false,
+      "providers": ["google.com"]
+    }
+  }
+}

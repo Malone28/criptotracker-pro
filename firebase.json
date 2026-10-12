@@ -1,0 +1,15 @@
+{
+  "auth": {
+    "providers": {
+      "anonymous": true,
+      "emailPassword": true,
+      "googleSignIn": {
+        "oAuthBrandDisplayName": "CriptoTracker Pro",
+        "supportEmail": "almon28@gmail.com",
+        "authorizedRedirectUris": [
+          "https://criptotracker.pro"
+        ]
+      }
+    }
+  }
+}
