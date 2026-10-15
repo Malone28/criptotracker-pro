@@ -52,3 +52,11 @@
 -dontwarn com.google.android.play.core.**
 -dontwarn org.apache.cordova.**
 -dontwarn androidx.**
+
+# Strip verbose/debug logs in release builds to minimize DEX size
+-assumenosideeffects class android.util.Log {
+    public static boolean isLoggable(java.lang.String, int);
+    public static int v(...);
+    public static int d(...);
+}
+

@@ -28,7 +28,7 @@
 
   function cacheDom() {
     els = {
-      tabs: document.querySelectorAll('.tab-btn'),
+      tabs: document.querySelectorAll('.tab-btn, .subnav-item'),
       panels: document.querySelectorAll('.tab-panel'),
       mainContent: document.querySelector('.main-content'),
       navHamburger: document.getElementById('nav-hamburger'),
@@ -277,29 +277,109 @@
     }
   }
 
-  // ==================== TAB SWITCHING ====================
-  function switchTab(tabId) {
+  // ==================== 4 PILARES Y SUB-NAVEGACIÓN ====================
+  const TAB_TO_PILLAR = {
+    'top50': 'markets',
+    'gainers': 'markets',
+    'favorites': 'markets',
+    'portfolio': 'portfolio',
+    'portfolio-analytics': 'portfolio',
+    'achievements': 'portfolio',
+    'premium': 'premium',
+    'glossary': 'learn',
+    'about': 'about'
+  };
+
+  let currentProSection = 'signals';
+
+  function setProSection(section) {
+    if (!section) return;
+    currentProSection = section;
+    const signalsSec = document.getElementById('pro-section-signals');
+    const metricsSec = document.getElementById('pro-section-metrics');
+    const reportSec = document.getElementById('pro-section-report');
+    if (signalsSec) signalsSec.style.display = (section === 'signals') ? 'block' : 'none';
+    if (metricsSec) metricsSec.style.display = (section === 'metrics') ? 'block' : 'none';
+    if (reportSec) reportSec.style.display = (section === 'report') ? 'block' : 'none';
+
+    document.querySelectorAll('.subnav-item[data-tab="premium"], .drawer-subtab-pro').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.proSection === section);
+    });
+  }
+
+  function switchTab(tabId, proSection) {
     if (!tabId) return;
     closeMobileMenu(); // Automatically close mobile drawer when any tab is clicked!
     currentTab = tabId;
-    els.tabs.forEach(btn => btn.classList.toggle('active', btn.dataset.tab === tabId));
+
+    const pillar = TAB_TO_PILLAR[tabId] || 'markets';
+
+    // 1. Update Pillar Buttons (Desktop Header)
+    document.querySelectorAll('.pillar-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.pillar === pillar);
+    });
+
+    // 2. Update PRO CTA Button
+    document.querySelectorAll('.nav-pro-cta-btn').forEach(btn => {
+      btn.classList.toggle('active', tabId === 'about');
+    });
+
+    // 3. Update Subnav Bar Groups
+    const subnavWrapper = document.getElementById('subnav-wrapper');
+    if (subnavWrapper) {
+      subnavWrapper.style.display = (pillar === 'about') ? 'none' : 'flex';
+    }
+    document.querySelectorAll('.subnav-pill-group').forEach(group => {
+      group.style.display = (group.id === 'subnav-' + pillar) ? 'flex' : 'none';
+    });
+
+    // 4. Update Active states on Subnav buttons
+    document.querySelectorAll('.subnav-item').forEach(btn => {
+      if (btn.dataset.tab === 'premium' && tabId === 'premium') {
+        const targetSec = proSection || currentProSection || 'signals';
+        btn.classList.toggle('active', btn.dataset.proSection === targetSec);
+      } else {
+        btn.classList.toggle('active', btn.dataset.tab === tabId);
+      }
+    });
+
+    // 5. Update Mobile Drawer buttons
+    document.querySelectorAll('.mobile-drawer .tab-btn').forEach(btn => {
+      if (btn.dataset.tab === 'premium' && tabId === 'premium') {
+        const targetSec = proSection || currentProSection || 'signals';
+        btn.classList.toggle('active', btn.dataset.proSection === targetSec);
+      } else {
+        btn.classList.toggle('active', btn.dataset.tab === tabId);
+      }
+    });
+
+    // 6. Update Active Panels
     els.panels.forEach(panel => {
       const isActive = panel.id === 'panel-' + tabId;
       panel.classList.toggle('active', isActive);
       panel.style.display = isActive ? 'block' : 'none';
     });
-    
-    if (tabId === 'portfolio' || tabId === 'about' || tabId === 'premium' || tabId === 'glossary') {
+
+    // 7. If premium and proSection is specified, activate it
+    if (tabId === 'premium') {
+      setProSection(proSection || currentProSection || 'signals');
+    }
+
+    // 8. Search bar contextual visibility (only visible on markets)
+    if (pillar !== 'markets') {
       if (els.searchBar) els.searchBar.classList.add('hidden');
     } else {
       if (els.searchBar) els.searchBar.classList.remove('hidden');
       if (els.searchInput) els.searchInput.value = '';
       searchQuery = '';
     }
+
     renderCurrentTab();
     drawSparklines();
     if (els.mainContent) els.mainContent.scrollTop = 0;
   }
+  window.switchTab = switchTab;
+  window.setProSection = setProSection;
 
   // ==================== ROW CARD RENDERING ====================
   function createCryptoRow(coin, index, showRank, isGainerView) {
@@ -388,7 +468,7 @@
   function renderCurrentTab() {
     if (window.Favorites) {
       const count = window.Favorites.count();
-      document.querySelectorAll('.tab-count').forEach(el => el.textContent = count);
+      document.querySelectorAll('.favorites-count, #favorites-count').forEach(el => el.textContent = count);
     }
     updateFab();
 
@@ -430,6 +510,10 @@
         break;
 
       case 'portfolio':
+        renderPortfolio();
+        break;
+
+      case 'portfolio-analytics':
         renderPortfolio();
         break;
 
@@ -1562,6 +1646,7 @@
       }
 
       renderPremiumAnalytics();
+      setProSection(currentProSection);
     }
   }
 
@@ -2780,10 +2865,12 @@
       });
     }
 
-    // Tabs Navigation
+    // Tabs Navigation (Pillars, Subtabs, Drawer)
     els.tabs.forEach(function(btn) {
       btn.addEventListener('click', function(e) {
-        switchTab(e.currentTarget.dataset.tab);
+        const tab = e.currentTarget.dataset.tab;
+        const proSec = e.currentTarget.dataset.proSection;
+        switchTab(tab, proSec);
       });
     });
 

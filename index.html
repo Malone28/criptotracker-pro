@@ -78,16 +78,30 @@
         </div>
       </div>
 
-      <!-- Desktop Navigation Tabs (Visible on screens > 960px) -->
+      <!-- Desktop Navigation Tabs (Visible on screens > 960px) - 4 Pilares Principales + CTA -->
       <nav class="desktop-nav-tabs">
-        <button class="tab-btn active" data-tab="top50" data-i18n="tab_top50">📊 Top 50</button>
-        <button class="tab-btn" data-tab="gainers" data-i18n="tab_gainers">🔥 Ganadores</button>
-        <button class="tab-btn" data-tab="favorites"><span data-i18n="tab_favorites">⭐ Favoritos</span> <span id="favorites-count" class="tab-count">0</span></button>
-        <button class="tab-btn" data-tab="portfolio" data-i18n="tab_portfolio">💼 Portfolio</button>
-        <button class="tab-btn" data-tab="achievements" data-i18n="tab_achievements">🏆 Logros</button>
-        <button class="tab-btn" data-tab="glossary" data-i18n="tab_glossary">📖 Vocabulario Cripto</button>
-        <button class="tab-btn tab-btn-premium" data-tab="premium" data-i18n="tab_premium">💎 Análisis Premium</button>
-        <button class="tab-btn" data-tab="about" data-i18n="tab_about">💳 Planes y Suscripción</button>
+        <button class="tab-btn pillar-btn active" data-pillar="markets" data-tab="top50">
+          <span class="tab-icon">📊</span>
+          <span class="pillar-label" data-i18n="pillar_markets">Mercados</span>
+        </button>
+        <button class="tab-btn pillar-btn" data-pillar="portfolio" data-tab="portfolio">
+          <span class="tab-icon">💼</span>
+          <span class="pillar-label" data-i18n="pillar_portfolio">Simulador / Cartera</span>
+        </button>
+        <button class="tab-btn pillar-btn tab-btn-premium" data-pillar="premium" data-tab="premium">
+          <span class="tab-icon">💎</span>
+          <span class="pillar-label" data-i18n="pillar_pro">Inteligencia PRO</span>
+        </button>
+        <button class="tab-btn pillar-btn" data-pillar="learn" data-tab="glossary">
+          <span class="tab-icon">📖</span>
+          <span class="pillar-label" data-i18n="pillar_learn">Aprender</span>
+        </button>
+
+        <!-- Botón destacado Planes PRO (CTA) -->
+        <button class="tab-btn nav-pro-cta-btn" data-tab="about" type="button" title="Ver Planes PRO">
+          <span class="tab-icon">✨</span>
+          <span class="pro-cta-text" data-i18n="nav_plans_cta">Planes PRO</span>
+        </button>
 
         <!-- Pestaña de Idioma / Language Tab (1. English, 2. Español) -->
         <div class="lang-tab-container" id="lang-tab-container">
@@ -170,6 +184,11 @@
           </button>
         </div>
 
+        <!-- Pilar 1: Mercados -->
+        <div class="drawer-section-heading">
+          <span class="section-badge">📊</span>
+          <span data-i18n="pillar_markets">Mercados</span>
+        </div>
         <button class="tab-btn active" data-tab="top50">
           <span class="tab-icon">📊</span>
           <span class="tab-text" data-i18n="drawer_top50">Top 50 Activos</span>
@@ -181,29 +200,66 @@
         <button class="tab-btn" data-tab="favorites">
           <span class="tab-icon">⭐</span>
           <span class="tab-text" data-i18n="drawer_favorites">Mis Favoritos</span>
-          <span class="tab-count" style="margin-left:auto;">0</span>
+          <span class="tab-count favorites-count" style="margin-left:auto;">0</span>
         </button>
+
+        <!-- Pilar 2: Simulador / Cartera -->
+        <div class="drawer-section-heading">
+          <span class="section-badge">💼</span>
+          <span data-i18n="pillar_portfolio">Simulador / Cartera</span>
+        </div>
         <button class="tab-btn" data-tab="portfolio">
           <span class="tab-icon">💼</span>
-          <span class="tab-text" data-i18n="drawer_portfolio">Simulador Portfolio</span>
+          <span class="tab-text" data-i18n="drawer_portfolio">Mi Portfolio</span>
+        </button>
+        <button class="tab-btn" data-tab="portfolio-analytics">
+          <span class="tab-icon">📈</span>
+          <span class="tab-text" data-i18n="subtab_analytics">Analítica Cuantitativa</span>
+          <span class="badge-pro" style="margin-left:auto;font-size:0.62rem;padding:2px 6px;">PRO</span>
         </button>
         <button class="tab-btn" data-tab="achievements">
           <span class="tab-icon">🏆</span>
           <span class="tab-text" data-i18n="drawer_achievements">Logros y Medallas</span>
           <span class="tab-count achievements-badge-count" style="margin-left:auto;background:rgba(251,191,36,0.2);color:#fbbf24;border:1px solid rgba(251,191,36,0.3);">0/11</span>
         </button>
+
+        <!-- Pilar 3: Inteligencia PRO -->
+        <div class="drawer-section-heading">
+          <span class="section-badge">💎</span>
+          <span data-i18n="pillar_pro">Inteligencia PRO</span>
+        </div>
+        <button class="tab-btn tab-btn-premium drawer-subtab-pro" data-tab="premium" data-pro-section="signals">
+          <span class="tab-icon">🎯</span>
+          <span class="tab-text" data-i18n="subtab_pro_signals">Señales (RSI/EMAs)</span>
+          <span class="badge-pro" style="margin-left:auto;font-size:0.62rem;padding:2px 6px;">VIP</span>
+        </button>
+        <button class="tab-btn tab-btn-premium drawer-subtab-pro" data-tab="premium" data-pro-section="metrics">
+          <span class="tab-icon">🌡️</span>
+          <span class="tab-text" data-i18n="subtab_pro_metrics">Fear & Greed / Dominancia</span>
+        </button>
+        <button class="tab-btn tab-btn-premium drawer-subtab-pro" data-tab="premium" data-pro-section="report">
+          <span class="tab-icon">📑</span>
+          <span class="tab-text" data-i18n="subtab_pro_report">Informe Diario</span>
+        </button>
+
+        <!-- Pilar 4: Aprender -->
+        <div class="drawer-section-heading">
+          <span class="section-badge">📖</span>
+          <span data-i18n="pillar_learn">Aprender</span>
+        </div>
         <button class="tab-btn" data-tab="glossary">
           <span class="tab-icon">📖</span>
           <span class="tab-text" data-i18n="drawer_glossary">Vocabulario Cripto</span>
         </button>
-        <button class="tab-btn tab-btn-premium" data-tab="premium">
-          <span class="tab-icon">💎</span>
-          <span class="tab-text" data-i18n="drawer_premium">Análisis Premium</span>
-          <span class="badge-pro" style="margin-left:auto;font-size:0.62rem;padding:2px 6px;">VIP</span>
-        </button>
+
+        <!-- Suscripción -->
+        <div class="drawer-section-heading">
+          <span class="section-badge">💳</span>
+          <span data-i18n="drawer_about">Planes y Suscripción</span>
+        </div>
         <button class="tab-btn" data-tab="about">
-          <span class="tab-icon">💳</span>
-          <span class="tab-text" data-i18n="drawer_about">Planes y Suscripción</span>
+          <span class="tab-icon">✨</span>
+          <span class="tab-text" data-i18n="nav_plans_cta">Ver Planes PRO</span>
         </button>
       </div>
 
@@ -216,6 +272,68 @@
 
     <!-- Main Content -->
     <main class="main-content">
+      <!-- Secondary Sub-Navigation Pills (Under Active Pillar) -->
+      <div class="subnav-wrapper" id="subnav-wrapper">
+        <!-- Pilar 1: Mercados -->
+        <div class="subnav-pill-group" id="subnav-markets">
+          <button type="button" class="subnav-item active" data-tab="top50">
+            <span class="subnav-icon">📊</span>
+            <span data-i18n="subtab_top50">Top 50</span>
+          </button>
+          <button type="button" class="subnav-item" data-tab="gainers">
+            <span class="subnav-icon">🔥</span>
+            <span data-i18n="subtab_gainers">Ganadores</span>
+          </button>
+          <button type="button" class="subnav-item" data-tab="favorites">
+            <span class="subnav-icon">⭐</span>
+            <span data-i18n="subtab_favorites">Favoritos</span>
+            <span class="tab-count favorites-count" id="favorites-count">0</span>
+          </button>
+        </div>
+
+        <!-- Pilar 2: Simulador / Cartera -->
+        <div class="subnav-pill-group" id="subnav-portfolio" style="display:none;">
+          <button type="button" class="subnav-item active" data-tab="portfolio">
+            <span class="subnav-icon">💼</span>
+            <span data-i18n="subtab_portfolio">Mi Portfolio</span>
+          </button>
+          <button type="button" class="subnav-item" data-tab="portfolio-analytics">
+            <span class="subnav-icon">📈</span>
+            <span data-i18n="subtab_analytics">Analítica Cuantitativa</span>
+            <span class="badge-pro" style="font-size:0.6rem;padding:2px 5px;margin-left:4px;">PRO</span>
+          </button>
+          <button type="button" class="subnav-item" data-tab="achievements">
+            <span class="subnav-icon">🏆</span>
+            <span data-i18n="subtab_achievements">Logros</span>
+            <span class="tab-count achievements-badge-count" style="margin-left:4px;background:rgba(251,191,36,0.2);color:#fbbf24;border:1px solid rgba(251,191,36,0.3);">0/11</span>
+          </button>
+        </div>
+
+        <!-- Pilar 3: Inteligencia PRO -->
+        <div class="subnav-pill-group" id="subnav-premium" style="display:none;">
+          <button type="button" class="subnav-item active" data-tab="premium" data-pro-section="signals">
+            <span class="subnav-icon">🎯</span>
+            <span data-i18n="subtab_pro_signals">Señales (RSI/EMAs)</span>
+          </button>
+          <button type="button" class="subnav-item" data-tab="premium" data-pro-section="metrics">
+            <span class="subnav-icon">🌡️</span>
+            <span data-i18n="subtab_pro_metrics">Fear & Greed / Dominancia</span>
+          </button>
+          <button type="button" class="subnav-item" data-tab="premium" data-pro-section="report">
+            <span class="subnav-icon">📑</span>
+            <span data-i18n="subtab_pro_report">Informe Diario</span>
+          </button>
+        </div>
+
+        <!-- Pilar 4: Aprender -->
+        <div class="subnav-pill-group" id="subnav-learn" style="display:none;">
+          <button type="button" class="subnav-item active" data-tab="glossary">
+            <span class="subnav-icon">📖</span>
+            <span data-i18n="subtab_glossary">Glosario Cripto</span>
+          </button>
+        </div>
+      </div>
+
       <div class="search-bar">
         <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M15.5 14H14.71L14.43 13.73C15.41 12.59 16 11.11 16 9.5C16 5.91 13.09 3 9.5 3C5.91 3 3 5.91 3 9.5C3 13.09 5.91 16 9.5 16C11.11 16 12.59 15.41 13.73 14.43L14 14.71V15.5L19 20.49L20.49 19L15.5 14ZM9.5 14C7.01 14 5 11.99 5 9.5C5 7.01 7.01 5 9.5 5C11.99 5 14 7.01 14 9.5C14 11.99 11.99 14 9.5 14Z" fill="currentColor"/>
@@ -383,7 +501,18 @@
           </div>
         </div>
 
-        <!-- ==================== PREMIUM PORTFOLIO ANALYTICS SECTION ==================== -->
+        <!-- Acceso directo a Analítica Cuantitativa -->
+        <div class="portfolio-quant-shortcut" onclick="if(window.switchTab) window.switchTab('portfolio-analytics');">
+          <div class="shortcut-text">
+            <strong>📊 Analítica Cuantitativa & Gráficos Avanzados</strong>
+            <span>Curva de capital, asignación de activos, ratio Sharpe y diagnóstico táctico</span>
+          </div>
+          <button type="button" class="btn btn-sm" style="background:rgba(99,102,241,0.25);color:#fff;border:1px solid rgba(99,102,241,0.4);border-radius:8px;padding:6px 12px;font-size:0.82rem;cursor:pointer;">Ver Analítica →</button>
+        </div>
+      </div>
+
+      <!-- Tab Panel: Analítica Cuantitativa de Cartera (Simulador / Cartera) -->
+      <div id="panel-portfolio-analytics" class="tab-panel">
         <div class="portfolio-premium-section" id="portfolio-premium-section">
           <div class="portfolio-premium-header">
             <div class="premium-badge-gold" style="background:rgba(251,191,36,0.15);color:#fbbf24;border-color:rgba(251,191,36,0.3);" data-i18n="port_prem_badge">ANÁLISIS INSTITUCIONAL & QUANT VIP</div>
@@ -706,153 +835,161 @@
               </button>
             </div>
 
-            <!-- Sentiment & Market Health Grid -->
-            <div class="premium-analytics-grid">
-              <!-- Fear & Greed Card -->
-              <div class="premium-card fear-greed-card">
-                <div class="card-header-flex">
-                  <h3 data-i18n="fear_greed_card_title">🌡️ Fear & Greed Index</h3>
-                  <span class="badge-live" data-i18n="badge_live">EN VIVO</span>
-                </div>
-                <div class="gauge-container">
-                  <div class="gauge-value-big" id="fg-value">68</div>
-                  <div class="gauge-label-state" id="fg-label" style="color: #22c55e;">CODICIA MODERADA (Greed)</div>
-                </div>
-                <div class="meter-bar-wrapper">
-                  <div class="meter-bar-fill" style="width: 68%;"></div>
-                </div>
-                <div class="meter-scales">
-                  <span data-i18n="fg_scale_0">0 Miedo Extremo</span>
-                  <span data-i18n="fg_scale_50">50 Neutral</span>
-                  <span data-i18n="fg_scale_100">100 Codicia Extrema</span>
-                </div>
-                <p class="card-footer-note" data-i18n="fg_footer_note">
-                  El sentimiento actual favorece la continuación de la tendencia alcista con baja presión de venta en exchanges.
-                </p>
-              </div>
-
-              <!-- Market Dominance Card -->
-              <div class="premium-card dominance-card">
-                <div class="card-header-flex">
-                  <h3 data-i18n="dom_card_title">📊 Dominancia & Flujo Institucional</h3>
-                  <span class="badge-live" data-i18n="badge_updated">ACTUALIZADO</span>
-                </div>
-                <div class="dominance-stats-list">
-                  <div class="dom-stat-row">
-                    <span class="dom-name">Bitcoin (BTC.D)</span>
-                    <span class="dom-pct" style="color: #f59e0b;">56.8%</span>
+            <!-- Section 1: Fear & Greed / Dominancia (pro-section-metrics) -->
+            <div id="pro-section-metrics" class="pro-section-group">
+              <div class="premium-analytics-grid">
+                <!-- Fear & Greed Card -->
+                <div class="premium-card fear-greed-card">
+                  <div class="card-header-flex">
+                    <h3 data-i18n="fear_greed_card_title">🌡️ Fear & Greed Index</h3>
+                    <span class="badge-live" data-i18n="badge_live">EN VIVO</span>
                   </div>
-                  <div class="meter-bar-wrapper mini"><div class="meter-bar-fill gold" style="width: 56.8%;"></div></div>
-
-                  <div class="dom-stat-row" style="margin-top: 10px;">
-                    <span class="dom-name">Ethereum (ETH.D)</span>
-                    <span class="dom-pct" style="color: #6366f1;">15.4%</span>
+                  <div class="gauge-container">
+                    <div class="gauge-value-big" id="fg-value">68</div>
+                    <div class="gauge-label-state" id="fg-label" style="color: #22c55e;">CODICIA MODERADA (Greed)</div>
                   </div>
-                  <div class="meter-bar-wrapper mini"><div class="meter-bar-fill indigo" style="width: 15.4%;"></div></div>
-
-                  <div class="dom-stat-row" style="margin-top: 10px;">
-                    <span class="dom-name" data-i18n="dom_altcoins">Altcoins & Stablecoins</span>
-                    <span class="dom-pct" style="color: #10b981;">27.8%</span>
+                  <div class="meter-bar-wrapper">
+                    <div class="meter-bar-fill" style="width: 68%;"></div>
                   </div>
-                  <div class="meter-bar-wrapper mini"><div class="meter-bar-fill green" style="width: 27.8%;"></div></div>
-                </div>
-                <p class="card-footer-note" data-i18n="dom_footer_note">
-                  Fase de consolidación en Bitcoin. Las altcoins de gran capitalización muestran entradas de liquidez sostenida.
-                </p>
-              </div>
-            </div>
-
-            <!-- Technical Signals Table -->
-            <div class="premium-card signals-card" style="margin-top: var(--spacing-xl);">
-              <div class="card-header-flex">
-                <div>
-                  <h3 style="font-size: 1.25rem;" data-i18n="signals_card_title">🎯 Señales Cuantitativas & Niveles Clave (Top Activos)</h3>
-                  <p style="font-size: 0.82rem; color: var(--text-secondary); margin-top: 2px;" data-i18n="signals_card_subtitle">Cálculo algorítmico basado en RSI (14), Medias Móviles Exponenciales y Volatilidad ATR.</p>
-                </div>
-                <span class="badge-pro" data-i18n="badge_pro_signals">PRO SIGNALS</span>
-              </div>
-
-              <div class="signals-table-wrapper">
-                <table class="signals-table">
-                  <thead>
-                    <tr>
-                      <th data-i18n="col_asset">Activo</th>
-                      <th data-i18n="col_price_curr">Precio Actual</th>
-                      <th data-i18n="col_rsi">RSI (14)</th>
-                      <th data-i18n="col_trend_emas">Tendencia (EMAs)</th>
-                      <th data-i18n="col_support">Soporte Clave</th>
-                      <th data-i18n="col_resistance">Resistencia Clave</th>
-                      <th data-i18n="col_verdict">Veredicto Algorítmico</th>
-                    </tr>
-                  </thead>
-                  <tbody id="signals-table-body">
-                    <!-- Populated dynamically via JS with real market data -->
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            <!-- Breakout & Market Opportunities Radar -->
-            <div class="premium-card opportunities-card" style="margin-top: var(--spacing-xl);">
-              <div class="card-header-flex">
-                <h3 data-i18n="opp_radar_title">🚨 Radar de Oportunidades & Patrones Detectados Hoy</h3>
-                <span class="badge-live" data-i18n="badge_today">HOY</span>
-              </div>
-              <div class="opportunities-grid" id="opportunities-grid">
-                <!-- Generated dynamically -->
-              </div>
-            </div>
-
-            <!-- Executive Macro Report -->
-            <div class="premium-card macro-report-card" style="margin-top: var(--spacing-xl);">
-              <div class="card-header-flex">
-                <h3 data-i18n="macro_report_title">📑 Informe Ejecutivo Diario del Mercado</h3>
-                <span class="badge-pro">ANALYSIS v3</span>
-              </div>
-              <div class="macro-content">
-                <p data-i18n-html="macro_summary">
-                  <strong>Resumen de Mercado:</strong> Los activos de primera línea mantienen una estructura técnica constructiva. La absorción de órdenes de venta en la zona de soporte institucional de Bitcoin sugiere acumulación por parte de grandes tenedores.
-                </p>
-                <div class="key-takeaways">
-                  <div class="takeaway-item">
-                    <span class="takeaway-bullet">✅</span>
-                    <span data-i18n-html="macro_takeaway_1"><strong>Nivel de invalidación alcista:</strong> Mantener cierres diarios por encima de soporte clave.</span>
+                  <div class="meter-scales">
+                    <span data-i18n="fg_scale_0">0 Miedo Extremo</span>
+                    <span data-i18n="fg_scale_50">50 Neutral</span>
+                    <span data-i18n="fg_scale_100">100 Codicia Extrema</span>
                   </div>
-                  <div class="takeaway-item">
-                    <span class="takeaway-bullet">⚠️</span>
-                    <span data-i18n-html="macro_takeaway_2"><strong>Zona de toma de beneficios:</strong> Próxima zona de resistencia técnica para rebalanceo de posiciones.</span>
-                  </div>
-                  <div class="takeaway-item">
-                    <span class="takeaway-bullet">📈</span>
-                    <span data-i18n-html="macro_takeaway_3"><strong>Ratio Riesgo/Beneficio:</strong> Favorable para estrategias de acumulación progresiva (DCA).</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- ── Institutional Daily Report ── -->
-            <div class="premium-card report-card" style="margin-top: var(--spacing-xl);">
-              <div class="card-header-flex">
-                <div>
-                  <h3 style="font-size: 1.25rem;" data-i18n="report_card_title">📊 Informe Diario Institucional</h3>
-                  <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 3px;" data-i18n="report_card_desc">
-                    Análisis cuantitativo generado automáticamente con datos de mercado en tiempo real
+                  <p class="card-footer-note" data-i18n="fg_footer_note">
+                    El sentimiento actual favorece la continuación de la tendencia alcista con baja presión de venta en exchanges.
                   </p>
                 </div>
-                <div style="display:flex; gap: 8px; align-items: center; flex-shrink:0;">
-                  <span class="badge-live">AUTO-GEN</span>
-                  <button type="button" id="generate-report-btn" class="btn btn-generate-report" data-i18n="btn_generate_report">
-                    ⚡ Generar Informe
-                  </button>
+
+                <!-- Market Dominance Card -->
+                <div class="premium-card dominance-card">
+                  <div class="card-header-flex">
+                    <h3 data-i18n="dom_card_title">📊 Dominancia & Flujo Institucional</h3>
+                    <span class="badge-live" data-i18n="badge_updated">ACTUALIZADO</span>
+                  </div>
+                  <div class="dominance-stats-list">
+                    <div class="dom-stat-row">
+                      <span class="dom-name">Bitcoin (BTC.D)</span>
+                      <span class="dom-pct" style="color: #f59e0b;">56.8%</span>
+                    </div>
+                    <div class="meter-bar-wrapper mini"><div class="meter-bar-fill gold" style="width: 56.8%;"></div></div>
+
+                    <div class="dom-stat-row" style="margin-top: 10px;">
+                      <span class="dom-name">Ethereum (ETH.D)</span>
+                      <span class="dom-pct" style="color: #6366f1;">15.4%</span>
+                    </div>
+                    <div class="meter-bar-wrapper mini"><div class="meter-bar-fill indigo" style="width: 15.4%;"></div></div>
+
+                    <div class="dom-stat-row" style="margin-top: 10px;">
+                      <span class="dom-name" data-i18n="dom_altcoins">Altcoins & Stablecoins</span>
+                      <span class="dom-pct" style="color: #10b981;">27.8%</span>
+                    </div>
+                    <div class="meter-bar-wrapper mini"><div class="meter-bar-fill green" style="width: 27.8%;"></div></div>
+                  </div>
+                  <p class="card-footer-note" data-i18n="dom_footer_note">
+                    Fase de consolidación en Bitcoin. Las altcoins de gran capitalización muestran entradas de liquidez sostenida.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Section 2: Señales Cuantitativas (RSI/EMAs) & Radar (pro-section-signals) -->
+            <div id="pro-section-signals" class="pro-section-group">
+              <!-- Technical Signals Table -->
+              <div class="premium-card signals-card" style="margin-top: var(--spacing-md);">
+                <div class="card-header-flex">
+                  <div>
+                    <h3 style="font-size: 1.25rem;" data-i18n="signals_card_title">🎯 Señales Cuantitativas & Niveles Clave (Top Activos)</h3>
+                    <p style="font-size: 0.82rem; color: var(--text-secondary); margin-top: 2px;" data-i18n="signals_card_subtitle">Cálculo algorítmico basado en RSI (14), Medias Móviles Exponenciales y Volatilidad ATR.</p>
+                  </div>
+                  <span class="badge-pro" data-i18n="badge_pro_signals">PRO SIGNALS</span>
+                </div>
+
+                <div class="signals-table-wrapper">
+                  <table class="signals-table">
+                    <thead>
+                      <tr>
+                        <th data-i18n="col_asset">Activo</th>
+                        <th data-i18n="col_price_curr">Precio Actual</th>
+                        <th data-i18n="col_rsi">RSI (14)</th>
+                        <th data-i18n="col_trend_emas">Tendencia (EMAs)</th>
+                        <th data-i18n="col_support">Soporte Clave</th>
+                        <th data-i18n="col_resistance">Resistencia Clave</th>
+                        <th data-i18n="col_verdict">Veredicto Algorítmico</th>
+                      </tr>
+                    </thead>
+                    <tbody id="signals-table-body">
+                      <!-- Populated dynamically via JS with real market data -->
+                    </tbody>
+                  </table>
                 </div>
               </div>
 
-              <!-- Report output area -->
-              <div id="report-output" class="report-output">
-                <div class="report-placeholder">
-                  <div class="report-placeholder-icon">📋</div>
-                  <p data-i18n-html="report_placeholder_p1">Haz clic en <strong>⚡ Generar Informe</strong> para producir el análisis institucional del mercado con los datos en tiempo real cargados en la plataforma.</p>
-                  <p style="font-size: 0.78rem; margin-top: 6px; color: var(--text-muted);" data-i18n="report_placeholder_p2">El informe se actualiza con cada regeneración usando los precios y métricas más recientes.</p>
+              <!-- Breakout & Market Opportunities Radar -->
+              <div class="premium-card opportunities-card" style="margin-top: var(--spacing-xl);">
+                <div class="card-header-flex">
+                  <h3 data-i18n="opp_radar_title">🚨 Radar de Oportunidades & Patrones Detectados Hoy</h3>
+                  <span class="badge-live" data-i18n="badge_today">HOY</span>
+                </div>
+                <div class="opportunities-grid" id="opportunities-grid">
+                  <!-- Generated dynamically -->
+                </div>
+              </div>
+            </div>
+
+            <!-- Section 3: Informe Diario Institucional & Macro (pro-section-report) -->
+            <div id="pro-section-report" class="pro-section-group">
+              <!-- Executive Macro Report -->
+              <div class="premium-card macro-report-card" style="margin-top: var(--spacing-md);">
+                <div class="card-header-flex">
+                  <h3 data-i18n="macro_report_title">📑 Informe Ejecutivo Diario del Mercado</h3>
+                  <span class="badge-pro">ANALYSIS v3</span>
+                </div>
+                <div class="macro-content">
+                  <p data-i18n-html="macro_summary">
+                    <strong>Resumen de Mercado:</strong> Los activos de primera línea mantienen una estructura técnica constructiva. La absorción de órdenes de venta en la zona de soporte institucional de Bitcoin sugiere acumulación por parte de grandes tenedores.
+                  </p>
+                  <div class="key-takeaways">
+                    <div class="takeaway-item">
+                      <span class="takeaway-bullet">✅</span>
+                      <span data-i18n-html="macro_takeaway_1"><strong>Nivel de invalidación alcista:</strong> Mantener cierres diarios por encima de soporte clave.</span>
+                    </div>
+                    <div class="takeaway-item">
+                      <span class="takeaway-bullet">⚠️</span>
+                      <span data-i18n-html="macro_takeaway_2"><strong>Zona de toma de beneficios:</strong> Próxima zona de resistencia técnica para rebalanceo de posiciones.</span>
+                    </div>
+                    <div class="takeaway-item">
+                      <span class="takeaway-bullet">📈</span>
+                      <span data-i18n-html="macro_takeaway_3"><strong>Ratio Riesgo/Beneficio:</strong> Favorable para estrategias de acumulación progresiva (DCA).</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- ── Institutional Daily Report ── -->
+              <div class="premium-card report-card" style="margin-top: var(--spacing-xl);">
+                <div class="card-header-flex">
+                  <div>
+                    <h3 style="font-size: 1.25rem;" data-i18n="report_card_title">📊 Informe Diario Institucional</h3>
+                    <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 3px;" data-i18n="report_card_desc">
+                      Análisis cuantitativo generado automáticamente con datos de mercado en tiempo real
+                    </p>
+                  </div>
+                  <div style="display:flex; gap: 8px; align-items: center; flex-shrink:0;">
+                    <span class="badge-live">AUTO-GEN</span>
+                    <button type="button" id="generate-report-btn" class="btn btn-generate-report" data-i18n="btn_generate_report">
+                      ⚡ Generar Informe
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Report output area -->
+                <div id="report-output" class="report-output">
+                  <div class="report-placeholder">
+                    <div class="report-placeholder-icon">📋</div>
+                    <p data-i18n-html="report_placeholder_p1">Haz clic en <strong>⚡ Generar Informe</strong> para producir el análisis institucional del mercado con los datos en tiempo real cargados en la plataforma.</p>
+                    <p style="font-size: 0.78rem; margin-top: 6px; color: var(--text-muted);" data-i18n="report_placeholder_p2">El informe se actualiza con cada regeneración usando los precios y métricas más recientes.</p>
+                  </div>
                 </div>
               </div>
             </div>

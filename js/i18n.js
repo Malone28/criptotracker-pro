@@ -23,7 +23,7 @@
       lang_name_en: 'English (EN)',
       lang_name_es: 'Spanish (ES)',
 
-      // Navigation Tabs
+      // Navigation Tabs & Pillars (4 Pilares)
       tab_top50: '📊 Top 50',
       tab_gainers: '🔥 Gainers',
       tab_favorites: '⭐ Favorites',
@@ -32,6 +32,25 @@
       tab_premium: '💎 Premium Analysis',
       tab_about: '💳 Plans & Pricing',
       tab_download: '📲 Download App',
+
+      // Navigation Pillars
+      pillar_markets: 'Markets',
+      pillar_portfolio: 'Simulator / Portfolio',
+      pillar_pro: 'PRO Intelligence',
+      pillar_learn: 'Learn',
+      nav_plans_cta: 'PRO Plans',
+
+      // Sub-tabs
+      subtab_top50: 'Top 50',
+      subtab_gainers: 'Top Gainers',
+      subtab_favorites: 'Favorites',
+      subtab_portfolio: 'My Portfolio',
+      subtab_analytics: 'Quantitative Analytics',
+      subtab_achievements: 'Achievements',
+      subtab_pro_signals: 'Signals (RSI/EMAs)',
+      subtab_pro_metrics: 'Fear & Greed / Dominance',
+      subtab_pro_report: 'Daily Report',
+      subtab_glossary: 'Crypto Glossary',
 
       // Mobile Drawer
       drawer_top50: 'Top 50 Assets',
@@ -409,7 +428,7 @@
       lang_name_en: 'Inglés (EN)',
       lang_name_es: 'Español (ES)',
 
-      // Navigation Tabs
+      // Navigation Tabs & Pillars (4 Pilares)
       tab_top50: '📊 Top 50',
       tab_gainers: '🔥 Ganadores',
       tab_favorites: '⭐ Favoritos',
@@ -418,6 +437,25 @@
       tab_premium: '💎 Análisis Premium',
       tab_about: '💳 Planes y Suscripción',
       tab_download: '📲 Descargar App',
+
+      // Navigation Pillars
+      pillar_markets: 'Mercados',
+      pillar_portfolio: 'Simulador / Cartera',
+      pillar_pro: 'Inteligencia PRO',
+      pillar_learn: 'Aprender',
+      nav_plans_cta: 'Planes PRO',
+
+      // Sub-tabs
+      subtab_top50: 'Top 50',
+      subtab_gainers: 'Ganadores',
+      subtab_favorites: 'Favoritos',
+      subtab_portfolio: 'Mi Portfolio',
+      subtab_analytics: 'Analítica Cuantitativa',
+      subtab_achievements: 'Logros',
+      subtab_pro_signals: 'Señales (RSI/EMAs)',
+      subtab_pro_metrics: 'Fear & Greed / Dominancia',
+      subtab_pro_report: 'Informe Diario',
+      subtab_glossary: 'Glosario Cripto',
 
       // Mobile Drawer
       drawer_top50: 'Top 50 Activos',

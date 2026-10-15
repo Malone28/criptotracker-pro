@@ -278,6 +278,177 @@ body {
   box-shadow: 0 0 10px var(--primary-glow);
 }
 
+/* ==================== 4 PILARES Y SUB-NAVEGACIÓN ==================== */
+.pillar-btn {
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 14px;
+}
+
+.pillar-btn.active {
+  background: rgba(99, 102, 241, 0.2) !important;
+  color: #ffffff !important;
+  font-weight: 600;
+}
+
+/* Standout PRO Plans CTA */
+.nav-pro-cta-btn {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.18), rgba(217, 119, 6, 0.28)) !important;
+  border: 1px solid rgba(245, 158, 11, 0.45) !important;
+  color: #fbbf24 !important;
+  font-weight: 700 !important;
+  border-radius: 9px !important;
+  padding: 6px 14px !important;
+  box-shadow: 0 0 14px rgba(245, 158, 11, 0.25);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  cursor: pointer !important;
+}
+
+.nav-pro-cta-btn:hover {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.3), rgba(217, 119, 6, 0.45)) !important;
+  border-color: rgba(245, 158, 11, 0.7) !important;
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.4) !important;
+  color: #fef08a !important;
+  transform: translateY(-1px);
+}
+
+.nav-pro-cta-btn.active {
+  background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+  color: #0b0f19 !important;
+  border-color: #f59e0b !important;
+  box-shadow: 0 0 22px rgba(245, 158, 11, 0.55) !important;
+}
+
+/* Sub-Navigation Bar (Sticky Pill Bar) */
+.subnav-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin: 0 0 1.25rem 0;
+  padding: 6px 10px;
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  position: relative;
+  z-index: 10;
+}
+.subnav-wrapper::-webkit-scrollbar {
+  display: none;
+}
+
+.subnav-pill-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: nowrap;
+}
+
+.subnav-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 15px;
+  font-size: 0.86rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+}
+
+.subnav-item:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.subnav-item.active {
+  color: #ffffff;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.28), rgba(79, 70, 229, 0.4));
+  border-color: rgba(99, 102, 241, 0.45);
+  font-weight: 600;
+  box-shadow: 0 2px 12px rgba(99, 102, 241, 0.3);
+}
+
+.subnav-icon {
+  font-size: 0.95rem;
+  line-height: 1;
+}
+
+/* Drawer Section Headings */
+.drawer-section-heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #64748b;
+  padding: 12px 14px 4px 14px;
+  margin-top: 6px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.drawer-section-heading:first-of-type {
+  border-top: none;
+  margin-top: 0;
+}
+
+.drawer-section-heading .section-badge {
+  font-size: 0.8rem;
+}
+
+/* Portfolio Shortcut Card */
+.portfolio-quant-shortcut {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 1.25rem;
+  padding: 14px 18px;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.12), rgba(168, 85, 247, 0.1));
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.portfolio-quant-shortcut:hover {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(168, 85, 247, 0.18));
+  border-color: rgba(99, 102, 241, 0.45);
+  transform: translateY(-1px);
+}
+
+.portfolio-quant-shortcut .shortcut-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.portfolio-quant-shortcut .shortcut-text strong {
+  color: #f8fafc;
+  font-size: 0.92rem;
+}
+
+.portfolio-quant-shortcut .shortcut-text span {
+  color: #94a3b8;
+  font-size: 0.8rem;
+}
+
 /* ==================== LANGUAGE SELECTOR TAB & DROPDOWN ==================== */
 .lang-tab-container {
   position: relative;
@@ -1974,6 +2145,20 @@ body:has(.modal-overlay:not(.hidden)) .portfolio-fab {
   /* Hide desktop horizontal tabs on mobile/tablet */
   .desktop-nav-tabs {
     display: none !important;
+  }
+
+  .subnav-wrapper {
+    margin-bottom: 0.75rem;
+    padding: 5px 8px;
+    border-radius: 12px;
+  }
+  .subnav-item {
+    padding: 6px 12px;
+    font-size: 0.8rem;
+    gap: 5px;
+  }
+  .subnav-icon {
+    font-size: 0.85rem;
   }
 
   /* Hamburger on the far left */
